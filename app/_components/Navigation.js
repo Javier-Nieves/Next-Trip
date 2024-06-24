@@ -1,9 +1,10 @@
 import Link from 'next/link';
-// import { auth } from '../_lib/auth';
+import { auth } from '../_lib/auth';
 
 export default async function Navigation() {
-  // const session = await auth();
-  // console.log(session);
+  const session = await auth();
+  // console.log('session: ', session);
+
   return (
     <nav className="z-10 text-xl">
       <ul className="flex gap-16 items-center">
@@ -31,7 +32,7 @@ export default async function Navigation() {
             Search
           </Link>
         </li>
-        {/* <li>
+        <li>
           {session?.user?.image ? (
             <Link
               href="/account"
@@ -43,17 +44,17 @@ export default async function Navigation() {
                 alt={session.user.name}
                 referrerPolicy="no-referrer"
               ></img>
-              <span>Guest area</span>
+              <span>Account</span>
             </Link>
           ) : (
             <Link
-              href="/account"
+              href="/login"
               className="hover:text-accent-400 transition-colors"
             >
-              Guest area
+              Login
             </Link>
           )}
-        </li> */}
+        </li>
       </ul>
     </nav>
   );

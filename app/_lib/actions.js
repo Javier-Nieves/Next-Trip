@@ -3,5 +3,5 @@
 import { handlers, auth, signIn, signOut } from './auth';
 
 export async function signInAction() {
-  await signIn('google', { redirectTo: '/' });
+  await signIn('google', { redirectTo: '/account' });
 }

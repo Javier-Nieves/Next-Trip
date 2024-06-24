@@ -38,24 +38,24 @@ const userSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
-  password: {
-    type: String,
-    required: true,
-    minlength: [8, 'Password should be at least 8 characters long'],
-  },
-  passwordConfirm: {
-    type: String,
-    required: true,
-    validate: {
-      validator: function (el) {
-        return el === this.password;
-      },
-      message: 'Password and validation do not match.',
-    },
-  },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
+  // password: {
+  //   type: String,
+  //   required: true,
+  //   minlength: [8, 'Password should be at least 8 characters long'],
+  // },
+  // passwordConfirm: {
+  //   type: String,
+  //   required: true,
+  //   validate: {
+  //     validator: function (el) {
+  //       return el === this.password;
+  //     },
+  //     message: 'Password and validation do not match.',
+  //   },
+  // },
+  // passwordChangedAt: Date,
+  // passwordResetToken: String,
+  // passwordResetExpires: Date,
   active: {
     type: Boolean,
     default: true,
@@ -73,18 +73,18 @@ const userSchema = new mongoose.Schema({
 //   },
 // });
 
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  this.password = await bcrypt.hash(this.password, 12);
-  this.passwordConfirm = undefined;
-  next();
-});
+// userSchema.pre('save', async function (next) {
+//   if (!this.isModified('password')) return next();
+//   this.password = await bcrypt.hash(this.password, 12);
+//   this.passwordConfirm = undefined;
+//   next();
+// });
 
-userSchema.methods.correctPassword = async function (
-  candidatePassword,
-  userPassword
-) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-};
+// userSchema.methods.correctPassword = async function (
+//   candidatePassword,
+//   userPassword
+// ) {
+//   return await bcrypt.compare(candidatePassword, userPassword);
+// };
 
-export default mongoose.models.User || mongoose.model('User', userSchema);
+export default mongoose.models?.User || mongoose.model('User', userSchema);

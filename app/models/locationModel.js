@@ -39,5 +39,5 @@ const locationScheema = new mongoose.Schema({
   images: [String],
 });
 
-export default mongoose.models.Location ||
+export default mongoose.models?.Location ||
   mongoose.model('Location', locationScheema);
