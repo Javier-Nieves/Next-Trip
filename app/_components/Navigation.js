@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { auth } from '../_lib/auth';
+import SignOutButton from './SignOutButton';
 
 export default async function Navigation() {
   const session = await auth();
@@ -34,18 +35,21 @@ export default async function Navigation() {
         </li>
         <li>
           {session?.user?.image ? (
-            <Link
-              href="/account"
-              className="hover:text-accent-400 transition-colors flex gap-4 items-center"
-            >
-              <img
-                src={session.user.image}
-                className="h-8 rounded-full"
-                alt={session.user.name}
-                referrerPolicy="no-referrer"
-              ></img>
-              <span>Account</span>
-            </Link>
+            <div className="flex">
+              <Link
+                href="/account"
+                className="hover:text-accent-400 transition-colors flex gap-4 items-center"
+              >
+                <img
+                  src={session.user.image}
+                  className="h-8 rounded-full"
+                  alt={session.user.name}
+                  referrerPolicy="no-referrer"
+                ></img>
+                <span>Account</span>
+              </Link>
+              <SignOutButton />
+            </div>
           ) : (
             <Link
               href="/login"

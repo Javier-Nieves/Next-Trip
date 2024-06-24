@@ -9,7 +9,7 @@ export async function middleware(req) {
   // If the token does not exist, redirect to the sign-in page
   if (!token) {
     const url = req.nextUrl.clone();
-    url.pathname = '/api/auth/signin';
+    url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
@@ -17,7 +17,7 @@ export async function middleware(req) {
   return NextResponse.next();
 }
 
-// Specify the paths that the middleware should apply to
+// paths in which the middleware applies
 export const config = {
   matcher: ['/account'],
 };
