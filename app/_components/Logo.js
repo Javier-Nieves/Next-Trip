@@ -12,9 +12,9 @@ function Logo() {
         quality={80}
         alt="See the world logo"
       />
-      <span className="text-xl font-semibold text-primary-100">
+      {/* <span className="text-xl font-semibold text-primary-100">
         See the World
-      </span>
+      </span> */}
     </Link>
   );
 }

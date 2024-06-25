@@ -7,6 +7,5 @@ export async function signInAction() {
 }
 
 export async function signOutAction() {
-  console.log('clicked');
   await signOut({ redirectTo: '/' });
 }

@@ -6,8 +6,9 @@ import TripCard from './_components/TripCard';
 
 export default async function Page() {
   // index page renders all public trips when user isn't logged in
-  const res = await fetch(`${process.env.SITE_URL}/api/trips`);
+  const res = await fetch(`${process.env.SITE_URL}/api/collections`);
   const trips = await res.json();
+  // console.log(trips);
 
   return (
     <div className="flex flex-col m-auto">

@@ -28,7 +28,7 @@ const authConfig = {
     // 3. Store userId in session
     async session({ session, user }) {
       const loggedUser = await getUser(session.user.email);
-      session.user.guestId = loggedUser._id;
+      session.user.id = loggedUser._id;
       return session;
     },
   },
