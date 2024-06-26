@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@edgestore/react": "^0.1.7",
+    "@edgestore/server": "^0.1.7",
     "@heroicons/react": "^2.1.4",
     "bcryptjs": "^2.4.3",
     "date-fns": "^3.6.0",
@@ -16,11 +18,16 @@
     "next": "14.2.4",
     "next-auth": "^5.0.0-beta.19",
     "react": "^18",
+    "react-day-picker": "^8.10.1",
     "react-dom": "^18",
+    "react-hook-form": "^7.52.0",
     "slugify": "^1.6.6",
-    "validator": "^13.12.0"
+    "validator": "^13.12.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/node": "20.14.8",
+    "@types/react": "18.3.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",

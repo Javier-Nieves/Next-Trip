@@ -1,9 +1,10 @@
 import TripCard from '@/app/_components/TripCard';
-import { getUserName } from '@/app/_lib/data-service';
+import { getUserInfo } from '@/app/_lib/data-service';
 
-// export const metadata = {
-//   title: 'Hello',
-// };
+export async function generateMetadata({ params }) {
+  const { name, isMe } = await getUserInfo(params.userId);
+  return { title: isMe ? 'My trips' : `Trips of ${name}` };
+}
 
 export default async function Page({ params }) {
   // collection === all trips of one user
@@ -14,7 +15,7 @@ export default async function Page({ params }) {
   );
   const trips = await res.json();
 
-  const { name, isMe, isFriend } = await getUserName(params.userId);
+  const { name, isMe, isFriend } = await getUserInfo(params.userId);
 
   return (
     <div className="flex flex-col m-auto">

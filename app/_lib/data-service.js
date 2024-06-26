@@ -22,7 +22,7 @@ export async function getUserTrips(userId, showPrivateTrips = false) {
   }).sort({
     createdAt: 1,
   });
-  // console.log('trips', trips);
+  console.log('trips', trips);
   return trips;
 }
 
@@ -30,19 +30,41 @@ export async function getUser(email) {
   await connectToDatabase();
   const user = await User.find({ email });
   return user.at(0);
+  // {
+  //   _id: new ObjectId('66795378a059a9fb42c4ec22'),
+  //   name: 'Konstantin Nikolskiy',
+  //   email: 'otro.konstantin@gmail.com',
+  //   photo: 'default.jpg',
+  //   role: 'user',
+  //   friends: [ new ObjectId('65444d163218278ffd2104f2') ],
+  //   friendRequests: [],
+  //   active: true,
+  // }
 }
 
-export async function getUserName(id) {
+export async function getUserInfo(id) {
   await connectToDatabase();
   const user = await User.findById(id);
   const session = await auth();
-  console.log();
+
+  // console.log(user);
 
   return {
     name: user.name,
     isMe: user._id.toString() === session.user.id,
     isFriend: user.friends.includes(session.user.id),
+    friends: user.friends,
   };
+}
+
+export async function getFriendsInfo() {
+  await connectToDatabase();
+  const session = await auth();
+  const user = await User.findById(session.user.id);
+  const friendIds = user.friends.map((user) => user.toString());
+  const friends = await Promise.all(friendIds.map((id) => User.findById(id)));
+  // console.log('friends', friends);
+  return { friends };
 }
 
 export async function createUser(newUser) {

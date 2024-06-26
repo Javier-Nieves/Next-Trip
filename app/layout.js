@@ -1,4 +1,5 @@
 import { Inter } from 'next/font/google';
+import { EdgeStoreProvider } from './_lib/edgestore';
 import Header from './_components/Header';
 import Logo from './_components/Logo';
 
@@ -23,7 +24,7 @@ export default function RootLayout({ children }) {
           <Logo />
         </Header>
 
-        {children}
+        <EdgeStoreProvider>{children}</EdgeStoreProvider>
       </body>
     </html>
   );

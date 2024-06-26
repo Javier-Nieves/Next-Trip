@@ -6,6 +6,11 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  /* react day picker */
+  --rdp-cell-size: 100px;
+  --rdp-caption-font-size: 30px;
+  --rdp-accent-color: indigo;
+  --rdp-background-color: gray;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,4 +35,8 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+h1 {
+  font-size: 2.5rem;
 }

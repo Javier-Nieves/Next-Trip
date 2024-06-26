@@ -35,6 +35,11 @@ export default async function Navigation() {
           </Link>
         </li>
         <li>
+          <Link href="/add" className="hover:text-accent-400 transition-colors">
+            Add trip
+          </Link>
+        </li>
+        <li>
           {session?.user?.image ? (
             <div className="flex">
               <Link

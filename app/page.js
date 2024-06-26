@@ -11,11 +11,11 @@ export default async function Page() {
   // console.log(trips);
 
   return (
-    <div className="flex flex-col m-auto">
-      <h1>Trips</h1>
-      <article className="grid grid-cols-3 gap-8 w-full">
-        {trips.data.map((trip) => (
-          <TripCard trip={trip} key={trip._id} />
+    <div className="flex items-center flex-col">
+      {/* <h1>Trips</h1> */}
+      <article className="grid grid-cols-3 gap-12 w-2/3 my-6">
+        {trips.data.map((trip, i) => (
+          <TripCard cardNumber={i} trip={trip} key={trip._id} />
         ))}
       </article>
     </div>
