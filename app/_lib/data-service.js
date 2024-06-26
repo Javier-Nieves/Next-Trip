@@ -64,15 +64,17 @@ export async function getFriendsInfo() {
   const friendIds = user.friends.map((user) => user.toString());
   const friends = await Promise.all(friendIds.map((id) => User.findById(id)));
   // console.log('friends', friends);
-  return { friends };
+  return { user, userId: session.user.id, friends };
 }
 
 export async function createUser(newUser) {
+  // console.log('creating ', newUser);
   await connectToDatabase();
   try {
     const data = await User.create({
       name: newUser.fullName,
       email: newUser.email,
+      photo: newUser.photo,
     });
     return data;
   } catch (error) {

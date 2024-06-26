@@ -15,13 +15,19 @@ const authConfig = {
     async signIn({ user, account, profile }) {
       // if user exists - move on, if not - create user document in the DB
       try {
+        // console.log('\x1b[36m%s\x1b[0m', 'user 1', user);
         const existingGuest = await getUser(user?.email);
 
         if (!existingGuest) {
-          await createUser({ email: user.email, fullName: user.name });
+          await createUser({
+            email: user.email,
+            fullName: user.name,
+            photo: user.image,
+          });
         }
         return true;
-      } catch {
+      } catch (err) {
+        // console.log('\x1b[36m%s\x1b[0m', 'false', err.message);
         return false;
       }
     },
