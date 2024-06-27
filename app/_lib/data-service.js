@@ -1,10 +1,10 @@
 import connectToDatabase from './mongoose';
 
 // all Models should be initilized for DB find() method to work
+import { auth } from './auth';
 import Trip from '../models/tripModel';
 import User from '../models/userModel';
-import { auth } from './auth';
-// import Location from '../models/locationModel';
+import Location from '../models/locationModel';
 
 export async function getPublicTrips() {
   await connectToDatabase();
@@ -22,7 +22,7 @@ export async function getUserTrips(userId, showPrivateTrips = false) {
   }).sort({
     createdAt: 1,
   });
-  console.log('trips', trips);
+  // console.log('trips', trips);
   return trips;
 }
 
@@ -46,12 +46,11 @@ export async function getUserInfo(id) {
   await connectToDatabase();
   const user = await User.findById(id);
   const session = await auth();
-
-  // console.log(user);
-
+  // console.log('getUserInfo', Boolean(session));
   return {
     name: user.name,
     isMe: user._id.toString() === session.user.id,
+    myId: session.user.id,
     isFriend: user.friends.includes(session.user.id),
     friends: user.friends,
   };
@@ -61,6 +60,7 @@ export async function getFriendsInfo() {
   await connectToDatabase();
   const session = await auth();
   const user = await User.findById(session.user.id);
+  // todo ? await User.findById(session.user.id).populate({ path: 'friends' });
   const friendIds = user.friends.map((user) => user.toString());
   const friends = await Promise.all(friendIds.map((id) => User.findById(id)));
   // console.log('friends', friends);

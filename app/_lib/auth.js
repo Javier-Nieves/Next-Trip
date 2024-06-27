@@ -35,6 +35,7 @@ const authConfig = {
     async session({ session, user }) {
       const loggedUser = await getUser(session.user.email);
       session.user.id = loggedUser._id;
+      // console.log('\x1b[36m%s\x1b[0m', 'AUTH', Boolean(session));
       return session;
     },
   },

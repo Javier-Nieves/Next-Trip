@@ -48,7 +48,7 @@ export default async function Navigation() {
               >
                 <img
                   src={session.user.image}
-                  className="h-8 rounded-full"
+                  className="h-8 rounded-full border-2 border-white"
                   alt={session.user.name}
                   referrerPolicy="no-referrer"
                 ></img>

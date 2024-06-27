@@ -4,9 +4,7 @@ import coverImage from '../../public/default-trip.jpeg';
 import travelerImage from '../../public/user.png';
 
 function TripCard({ trip, cardNumber }) {
-  //   console.log(trip);
   const formattedDate = format(trip.date, 'dd MMMM yyyy');
-
   return (
     <div
       className={`${
@@ -15,7 +13,7 @@ function TripCard({ trip, cardNumber }) {
     >
       <div className="relative h-2/3">
         <Image
-          src={coverImage}
+          src={trip.coverImage}
           alt={trip.name}
           layout="fill"
           objectFit="cover"

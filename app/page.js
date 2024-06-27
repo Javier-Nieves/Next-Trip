@@ -8,7 +8,7 @@ export default async function Page() {
   // index page renders all public trips when user isn't logged in
   const res = await fetch(`${process.env.SITE_URL}/api/collections`);
   const trips = await res.json();
-  // console.log(trips);
+  // console.log('PAGE!!', trips.status);
 
   return (
     <div className="flex items-center flex-col">

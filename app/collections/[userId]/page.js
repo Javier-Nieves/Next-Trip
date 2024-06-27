@@ -1,5 +1,5 @@
 import TripCard from '@/app/_components/TripCard';
-import { getUserInfo } from '@/app/_lib/data-service';
+import { getUserInfo, getUserTrips } from '@/app/_lib/data-service';
 
 export async function generateMetadata({ params }) {
   const { name, isMe } = await getUserInfo(params.userId);
@@ -8,21 +8,21 @@ export async function generateMetadata({ params }) {
 
 export default async function Page({ params }) {
   // collection === all trips of one user
-  // todo - show public if you're not friends
-
-  const res = await fetch(
-    `${process.env.SITE_URL}/api/collections/${params.userId}`
+  // show public if you're not friends, show all is you are of it's your page
+  const { name, myId, isMe, isFriend, friends } = await getUserInfo(
+    params.userId,
   );
-  const trips = await res.json();
+  const trustedIds = friends.map((friend) => friend.toString());
+  trustedIds.push(params.userId);
 
-  const { name, isMe, isFriend } = await getUserInfo(params.userId);
+  const trips = await getUserTrips(params.userId, trustedIds.includes(myId));
 
   return (
     <div className="flex flex-col m-auto">
       <h1>{isMe ? 'My trips' : `Trips of ${name}`}</h1>
       <h1>{!isMe ? (isFriend ? 'Your friend!' : 'Just a bloke') : ''}</h1>
       <article className="grid grid-cols-3 gap-8 w-full">
-        {trips.data.map((trip) => (
+        {trips.map((trip) => (
           <TripCard trip={trip} key={trip._id} />
         ))}
       </article>
