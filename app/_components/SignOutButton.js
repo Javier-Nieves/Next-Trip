@@ -3,9 +3,9 @@ import { signOutAction } from '../_lib/actions';
 
 function SignOutButton() {
   return (
-    <form action={signOutAction}>
-      <button className="py-3 px-5 flex items-center gap-4 font-semibold w-full">
-        <ArrowRightOnRectangleIcon className="h-5 w-5" />
+    <form action={signOutAction} className="flex items-center">
+      <button className="w-full gap-4">
+        <ArrowRightOnRectangleIcon className="w-5 h-5" />
       </button>
     </form>
   );

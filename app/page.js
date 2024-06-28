@@ -15,9 +15,9 @@ export default async function Page() {
   const trips = await getPublicTrips();
 
   return (
-    <div className="flex items-center flex-col">
+    <div className="flex flex-col items-center">
       {/* <h1>Trips</h1> */}
-      <article className="grid grid-cols-3 gap-12 w-2/3 my-6">
+      <article className="grid w-full grid-cols-2 gap-4 p-4 my-6 md:gap-12 md:grid-cols-3 lg:w-2/3">
         {trips.map((trip, i) => (
           <TripCard cardNumber={i} trip={trip} key={trip._id} />
         ))}

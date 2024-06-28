@@ -1,56 +1,53 @@
 import Image from 'next/image';
 import { format } from 'date-fns';
+import Link from 'next/link';
 import travelerImage from '../../public/user.png';
 import { getUserInfo } from '../_lib/data-service';
-import Link from 'next/link';
+import { relative } from 'path';
 
 async function TripCard({ trip, cardNumber }) {
-  const { name, photo } = await getUserInfo(trip.createdBy);
+  const { name, photo, isFriend, isMe } = await getUserInfo(trip.createdBy);
+  // todo make a popup make of the traveler
   // console.log('\x1b[36m%s\x1b[0m', 'createdBy', photo);
 
   const formattedDate = trip.date ? format(trip.date, 'dd MMMM yyyy') : '';
-  // return (
-  //   <div class="relative w-64 h-64 bg-blue-500">
-  //     <div class="absolute inset-0 flex items-center justify-center">
-  //       <div class="bg-white p-4 rounded shadow">This is a centered div.</div>
-  //     </div>
-  //   </div>
-  // );
   return (
     <div
       className={`${
-        cardNumber < 3 ? 'w-full' : 'w-4/5 mx-auto'
-      } bg-white shadow-lg rounded-lg overflow-hidden aspect-[2/3] relative`}
+        cardNumber < 3 ? 'w-full' : 'md:w-4/5 md:mx-auto'
+      } bg-white shadow-lg rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-cyan-500 outline-offset-1' : ''} ${isMe ? 'outline outline-lime-500 outline-offset-1' : ''}`}
     >
-      <div className="relative h-2/3">
+      <div className="relative h-1/2 md:h-2/3">
         <Image
           src={trip.coverImage}
           alt={trip.name}
-          layout="fill"
-          objectFit="cover"
-          className="w-full h-full"
+          fill
+          // placeholder="blur"
+          sizes="300px"
+          className="object-cover w-full h-full"
         />
       </div>
       {travelerImage && (
-        <div className="relative">
-          <div className="ease-in-out duration-300 hover:cursor-pointer hover:scale-105 absolute top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14  aspect-square rounded-full overflow-hidden border-4 border-white">
+        <div>
+          <div className="absolute overflow-hidden duration-300 ease-in-out transform -translate-x-1/2 -translate-y-1/2 border-4 border-white rounded-full w-[3.2rem] hover:cursor-pointer hover:scale-105 top-1/2 md:top-2/3 left-1/2 aspect-square">
             <Link href={`/collections/${trip.createdBy}`}>
               <img
-                src={photo}
+                src={photo || travelerImage}
                 alt="Traveler"
-                layout="fill"
-                objectFit="cover"
-                className="w-full h-full"
+                // layout="fill"
+                // objectFit="cover"
+                className="object-cover w-full h-full"
               />
             </Link>
           </div>
-          {/* <div className="transition-opacity duration-300 absolute inset-0 group-hover:opacity-100 flex items-center justify-center">
-            <div className="bg-orange-300 rounded-md p-1">{name}</div>
+          {/* <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300 group-hover:opacity-100">
+            <div className="p-1 bg-orange-300 rounded-md">{name}</div>
           </div> */}
         </div>
       )}
-      <div className="h-1/3 p-4 flex flex-col justify-center">
-        <h2 className="text-lg font-semibold">{trip.name}</h2>
+
+      <div className="flex flex-col justify-center p-4 text-center h-1/3">
+        <h2 className="text-lg font-semibold mt-7">{trip.name}</h2>
         <p className="text-gray-600">{formattedDate}</p>
       </div>
     </div>
@@ -84,7 +81,7 @@ export default TripCard;
 //     />
 //     <div className="flex flex-col bg-slate-100 mt-[200px] py-5 absolute bottom-0 w-full !h-1/2">
 //       <div className="text-center">{formattedDate}</div>
-//       <h1 className="text-center text-xl">{trip.name}</h1>
+//       <h1 className="text-xl text-center">{trip.name}</h1>
 //     </div>
 //   </section>
 // );

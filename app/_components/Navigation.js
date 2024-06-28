@@ -9,37 +9,37 @@ export default async function Navigation() {
 
   return (
     <nav className="z-10 text-xl">
-      <ul className="flex gap-16 items-center">
+      <ul className="flex items-center gap-16">
         <li>
           <Link
             href="/search"
-            className="hover:text-accent-400 transition-colors"
+            className="transition-colors hover:text-accent-400"
           >
             Search
           </Link>
         </li>
         {user && (
           <>
-            <li>
+            <li className="hidden lg:block">
               <Link
                 href={`/collections/${user?.id}`}
-                className="hover:text-accent-400 transition-colors"
+                className="transition-colors hover:text-accent-400"
               >
                 My trips
               </Link>
             </li>
-            <li>
+            <li className="hidden lg:block">
               <Link
                 href="/friends"
-                className="hover:text-accent-400 transition-colors"
+                className="transition-colors hover:text-accent-400"
               >
                 My friends
               </Link>
             </li>
-            <li>
+            <li className="hidden lg:block">
               <Link
                 href="/add"
-                className="hover:text-accent-400 transition-colors"
+                className="transition-colors hover:text-accent-400"
               >
                 Add trip
               </Link>
@@ -48,25 +48,25 @@ export default async function Navigation() {
         )}
         <li>
           {session?.user?.image ? (
-            <div className="flex">
+            <div className="flex gap-3">
               <Link
                 href="/account"
-                className="hover:text-accent-400 transition-colors flex gap-4 items-center"
+                className="flex items-center transition-colors hover:text-accent-400"
               >
                 <img
                   src={session.user.image}
-                  className="h-8 rounded-full border-2 border-white"
+                  className="w-12 border-2 border-white rounded-full aspect-square"
                   alt={session.user.name}
                   referrerPolicy="no-referrer"
                 ></img>
-                <span>Account</span>
+                {/* <span className="hidden lg:block">Account</span> */}
               </Link>
               <SignOutButton />
             </div>
           ) : (
             <Link
               href="/login"
-              className="hover:text-accent-400 transition-colors"
+              className="transition-colors hover:text-accent-400"
             >
               Login
             </Link>
