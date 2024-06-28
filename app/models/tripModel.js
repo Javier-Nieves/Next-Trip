@@ -31,7 +31,7 @@ const tripSchema = new mongoose.Schema({
   },
   date: {
     type: Date,
-    required: [true, 'A trip must have a date'],
+    // required: [true, 'A trip must have a date'],
   },
   duration: String,
   createdBy: String,

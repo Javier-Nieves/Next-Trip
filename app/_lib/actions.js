@@ -5,6 +5,8 @@ import User from '../models/userModel';
 
 import connectToDatabase from './mongoose';
 import { handlers, auth, signIn, signOut } from './auth';
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
 
 export async function signInAction() {
   await signIn('google', { redirectTo: '/account' });
@@ -22,9 +24,9 @@ export async function createTrip(data) {
     'highlight', 'description', 'private', 'coverImage', 'createdAt', 'createdBy' );
 
   const newTrip = await Trip.create(filteredBody);
-  console.log(newTrip);
-  // return { status: 'success', data: { newTrip } };
-  // redirect('/');
+  // console.log(newTrip);
+  revalidatePath(`/`);
+  redirect('/');
 }
 
 function filterBody(obj, ...allowedFields) {

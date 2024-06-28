@@ -4,7 +4,7 @@ function TravelersList({ travelers, handleRemoveTraveler }) {
       {travelers.map((traveler) => (
         <li
           onClick={() => handleRemoveTraveler(traveler)}
-          key={traveler.id}
+          key={traveler._id}
           className="flex items-center mx-4 my-2 p-2 border-r border-primary-800 hover:cursor-pointer relative group border border-stone-400 rounded-lg shadow-md"
         >
           <img

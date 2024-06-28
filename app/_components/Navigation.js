@@ -12,33 +12,40 @@ export default async function Navigation() {
       <ul className="flex gap-16 items-center">
         <li>
           <Link
-            href={`/collections/${user?.id}`}
-            className="hover:text-accent-400 transition-colors"
-          >
-            My trips
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/friends"
-            className="hover:text-accent-400 transition-colors"
-          >
-            My friends
-          </Link>
-        </li>
-        <li>
-          <Link
             href="/search"
             className="hover:text-accent-400 transition-colors"
           >
             Search
           </Link>
         </li>
-        <li>
-          <Link href="/add" className="hover:text-accent-400 transition-colors">
-            Add trip
-          </Link>
-        </li>
+        {user && (
+          <>
+            <li>
+              <Link
+                href={`/collections/${user?.id}`}
+                className="hover:text-accent-400 transition-colors"
+              >
+                My trips
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/friends"
+                className="hover:text-accent-400 transition-colors"
+              >
+                My friends
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/add"
+                className="hover:text-accent-400 transition-colors"
+              >
+                Add trip
+              </Link>
+            </li>
+          </>
+        )}
         <li>
           {session?.user?.image ? (
             <div className="flex">

@@ -8,7 +8,7 @@ import Location from '../models/locationModel';
 
 export async function getPublicTrips() {
   await connectToDatabase();
-  const trips = await Trip.find({ private: false }).sort({ createdAt: 1 });
+  const trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
   // console.log('trips', trips);
   return trips;
 }
@@ -43,17 +43,22 @@ export async function getUser(email) {
 }
 
 export async function getUserInfo(id) {
-  await connectToDatabase();
-  const user = await User.findById(id);
-  const session = await auth();
-  // console.log('getUserInfo', Boolean(session));
-  return {
-    name: user.name,
-    isMe: user._id.toString() === session.user.id,
-    myId: session.user.id,
-    isFriend: user.friends.includes(session.user.id),
-    friends: user.friends,
-  };
+  try {
+    await connectToDatabase();
+    const user = await User.findById(id);
+    const session = await auth();
+    // console.log('getUserInfo', Boolean(session));
+    return {
+      name: user?.name,
+      photo: user?.photo,
+      isMe: user?._id.toString() === session?.user.id,
+      myId: session?.user.id,
+      isFriend: user?.friends.includes(session?.user.id),
+      friends: user?.friends,
+    };
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 export async function getFriendsInfo() {

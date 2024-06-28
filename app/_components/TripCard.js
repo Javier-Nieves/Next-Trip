@@ -1,10 +1,21 @@
 import Image from 'next/image';
 import { format } from 'date-fns';
-import coverImage from '../../public/default-trip.jpeg';
 import travelerImage from '../../public/user.png';
+import { getUserInfo } from '../_lib/data-service';
+import Link from 'next/link';
 
-function TripCard({ trip, cardNumber }) {
-  const formattedDate = format(trip.date, 'dd MMMM yyyy');
+async function TripCard({ trip, cardNumber }) {
+  const { name, photo } = await getUserInfo(trip.createdBy);
+  // console.log('\x1b[36m%s\x1b[0m', 'createdBy', photo);
+
+  const formattedDate = trip.date ? format(trip.date, 'dd MMMM yyyy') : '';
+  // return (
+  //   <div class="relative w-64 h-64 bg-blue-500">
+  //     <div class="absolute inset-0 flex items-center justify-center">
+  //       <div class="bg-white p-4 rounded shadow">This is a centered div.</div>
+  //     </div>
+  //   </div>
+  // );
   return (
     <div
       className={`${
@@ -21,14 +32,21 @@ function TripCard({ trip, cardNumber }) {
         />
       </div>
       {travelerImage && (
-        <div className="absolute top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14  aspect-square rounded-full overflow-hidden border-4 border-white">
-          <Image
-            src={travelerImage}
-            alt="Traveler"
-            layout="fill"
-            objectFit="cover"
-            className="w-full h-full"
-          />
+        <div className="relative">
+          <div className="ease-in-out duration-300 hover:cursor-pointer hover:scale-105 absolute top-2/3 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14  aspect-square rounded-full overflow-hidden border-4 border-white">
+            <Link href={`/collections/${trip.createdBy}`}>
+              <img
+                src={photo}
+                alt="Traveler"
+                layout="fill"
+                objectFit="cover"
+                className="w-full h-full"
+              />
+            </Link>
+          </div>
+          {/* <div className="transition-opacity duration-300 absolute inset-0 group-hover:opacity-100 flex items-center justify-center">
+            <div className="bg-orange-300 rounded-md p-1">{name}</div>
+          </div> */}
         </div>
       )}
       <div className="h-1/3 p-4 flex flex-col justify-center">
