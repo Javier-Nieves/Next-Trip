@@ -4,6 +4,7 @@ import Header from './_components/Header';
 import Logo from './_components/Logo';
 
 import './globals.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
