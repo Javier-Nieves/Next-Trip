@@ -72,6 +72,12 @@ export async function getFriendsInfo() {
   return { user, userId: session.user.id, friends };
 }
 
+export async function getTripInfo(tripId) {
+  await connectToDatabase();
+  const trip = await Trip.findById(tripId);
+  return { trip };
+}
+
 export async function createUser(newUser) {
   // console.log('creating ', newUser);
   await connectToDatabase();

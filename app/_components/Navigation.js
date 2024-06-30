@@ -1,24 +1,32 @@
 import Link from 'next/link';
 import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
+import { headers } from 'next/headers';
 
 export default async function Navigation() {
   const session = await auth();
   // console.log('session: ', session);
+
   const user = session?.user;
+  const headersList = headers();
+  // read the custom x-url header (from middleware)
+  const header_url = headersList.get('x-url') || '';
+  const isTripPage = header_url.includes('/trips');
 
   return (
     <nav className="z-10 text-xl">
       <ul className="flex items-center gap-16">
-        <li>
-          <Link
-            href="/search"
-            className="transition-colors hover:text-accent-400"
-          >
-            Search
-          </Link>
-        </li>
-        {user && (
+        {!isTripPage && (
+          <li>
+            <Link
+              href="/search"
+              className="transition-colors hover:text-accent-400"
+            >
+              Search
+            </Link>
+          </li>
+        )}
+        {user && !isTripPage && (
           <>
             <li className="hidden lg:block">
               <Link
