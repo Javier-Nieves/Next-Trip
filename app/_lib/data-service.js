@@ -7,29 +7,41 @@ import User from '../models/userModel';
 import Location from '../models/locationModel';
 
 export async function getPublicTrips() {
-  await connectToDatabase();
-  const trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
-  // console.log('trips', trips);
-  return trips;
+  try {
+    await connectToDatabase();
+    const trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
+    // console.log('trips', trips);
+    return trips;
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 export async function getUserTrips(userId, showPrivateTrips = false) {
-  await connectToDatabase();
-  // find all trip where User was a traveler
-  const trips = await Trip.find({
-    travelers: userId,
-    private: showPrivateTrips,
-  }).sort({
-    createdAt: 1,
-  });
-  // console.log('trips', trips);
-  return trips;
+  try {
+    await connectToDatabase();
+    // find all trip where User was a traveler
+    const trips = await Trip.find({
+      travelers: userId,
+      private: showPrivateTrips,
+    }).sort({
+      createdAt: 1,
+    });
+    // console.log('trips', trips);
+    return trips;
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 export async function getUser(email) {
-  await connectToDatabase();
-  const user = await User.find({ email });
-  return user.at(0);
+  try {
+    await connectToDatabase();
+    const user = await User.find({ email });
+    return user.at(0);
+  } catch (err) {
+    console.error(err.message);
+  }
   // {
   //   _id: new ObjectId('66795378a059a9fb42c4ec22'),
   //   name: 'Konstantin Nikolskiy',
@@ -62,26 +74,33 @@ export async function getUserInfo(id) {
 }
 
 export async function getFriendsInfo() {
-  await connectToDatabase();
-  const session = await auth();
-  const user = await User.findById(session.user.id);
-  // todo ? await User.findById(session.user.id).populate({ path: 'friends' });
-  const friendIds = user.friends.map((user) => user.toString());
-  const friends = await Promise.all(friendIds.map((id) => User.findById(id)));
-  // console.log('friends', friends);
-  return { user, userId: session.user.id, friends };
+  try {
+    await connectToDatabase();
+    const session = await auth();
+    const user = await User.findById(session.user.id);
+    // todo ? await User.findById(session.user.id).populate({ path: 'friends' });
+    const friendIds = user.friends.map((user) => user.toString());
+    const friends = await Promise.all(friendIds.map((id) => User.findById(id)));
+    // console.log('friends', friends);
+    return { user, userId: session.user.id, friends };
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 export async function getTripInfo(tripId) {
-  await connectToDatabase();
-  const trip = await Trip.findById(tripId);
-  return { trip };
+  try {
+    await connectToDatabase();
+    const trip = await Trip.findById(tripId);
+    return { trip };
+  } catch (err) {
+    console.error(err.message);
+  }
 }
 
 export async function createUser(newUser) {
-  // console.log('creating ', newUser);
-  await connectToDatabase();
   try {
+    await connectToDatabase();
     const data = await User.create({
       name: newUser.fullName,
       email: newUser.email,

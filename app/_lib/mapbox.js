@@ -1,16 +1,35 @@
 import mapboxgl from '!mapbox-gl';
 
-export default function mapbox({
-  mapContainer,
-  locations,
-  // waypoints,
-  // features,
-  // setFeatures,
-}) {
+export default async function mapbox({ mapContainer, locations }) {
   // waypoints - array for GeoJson creation => routes
   let waypoints = [];
   // features - array for the map.addSource method, contains Locations data
   let features = [];
+
+  function handleGetLocation() {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            resolve([position.coords.longitude, position.coords.latitude]);
+          },
+          (error) => {
+            console.error(error);
+            // random coordinates in case user doesn't allow geolocation
+            resolve([2.35, 43.225]);
+          },
+        );
+      } else {
+        reject('Geolocation is not supported by this browser.');
+      }
+    });
+  }
+
+  // center map to trip locations of user's location
+  let center = [];
+  if (!locations.length) center = await handleGetLocation();
+  else center = [locations[0].coordinates[0], locations[0].coordinates[1]];
+
   // PUBLIC ACCESS TOKEN:
   mapboxgl.accessToken =
     'pk.eyJ1IjoiamF2aWVyLW5pZXZlcyIsImEiOiJjbG5heWppeDUwN2FyMmxwZ2VqZjBxZGdqIn0.jaVtxVlnW5rlkf2jlNVFlg';
@@ -18,7 +37,7 @@ export default function mapbox({
   const map = new mapboxgl.Map({
     container: mapContainer,
     style: 'mapbox://styles/mapbox/streets-v12',
-    center: [locations[0].coordinates[0], locations[0].coordinates[1]],
+    center,
     zoom: 9,
   });
   // adding scale

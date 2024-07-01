@@ -5,15 +5,6 @@ import mapbox from '@/app/_lib/mapbox';
 
 export default function Page({ params }) {
   const [trip, setTrip] = useState({});
-  const [lat, setLat] = useState(42.35);
-  const [lng, setLng] = useState(-70.9);
-  const [zoom, setZoom] = useState(9);
-
-  // waypoints - array for GeoJson creation => routes
-  //   const [waypoints, setWaipoints] = useState([]);
-  // features - array for the map.addSource method, contains Locations data
-  //   const [features, setFeatures] = useState([]);
-
   const mapContainer = useRef(null);
   const map = useRef(null);
 
@@ -29,9 +20,6 @@ export default function Page({ params }) {
       map.current = mapbox({
         mapContainer: mapContainer.current,
         locations: data.data.trip.locations,
-        // waypoints,
-        // features,
-        // setFeatures,
       });
     }
     displayMap();
