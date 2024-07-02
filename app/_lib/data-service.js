@@ -61,6 +61,7 @@ export async function getUserInfo(id) {
     const session = await auth();
     // console.log('getUserInfo', Boolean(session));
     return {
+      user,
       name: user?.name,
       photo: user?.photo,
       isMe: user?._id.toString() === session?.user.id,

@@ -5,18 +5,18 @@ import { getUserInfo } from '../_lib/data-service';
 import PhotoLink from './PhotoLink';
 
 async function TripCard({ trip, cardNumber }) {
-  const { name, photo, isFriend, isMe } = await getUserInfo(trip.createdBy);
+  const { user, isFriend, isMe } = await getUserInfo(trip.createdBy);
   // todo make a popup make of the traveler
   // console.log('\x1b[36m%s\x1b[0m', 'createdBy', photo);
 
   const formattedDate = trip.date ? format(trip.date, 'dd MMMM yyyy') : '';
-
+  // console.log(user);
   // Link is separates in two parts to avoid hydration error (nested Links don't work)
   return (
     <div
       className={`${
         cardNumber < 3 ? 'w-full' : 'md:w-4/5 md:mx-auto'
-      } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-cyan-500 outline-offset-2' : ''} ${isMe ? 'outline outline-lime-500 outline-offset-2' : ''} hover:scale-[1.01] hover:cursor-pointer`}
+      } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-cyan-500 outline-offset-4' : ''} ${isMe ? 'outline outline-lime-500 outline-offset-4' : ''} hover:scale-[1.01] hover:cursor-pointer`}
     >
       <Link href={`/trips/${trip.id}`}>
         <div className="relative h-1/2 md:h-2/3">
@@ -30,7 +30,12 @@ async function TripCard({ trip, cardNumber }) {
         </div>
       </Link>
 
-      <PhotoLink name={name} photo={photo} trip={trip} />
+      <PhotoLink
+        user={user}
+        position={
+          'absolute -translate-x-1/2 -translate-y-1/2 top-1/2 md:top-2/3 left-1/2'
+        }
+      />
 
       <Link href={`/trips/${trip.id}`}>
         <div className="flex flex-col justify-center p-4 text-center h-1/3">

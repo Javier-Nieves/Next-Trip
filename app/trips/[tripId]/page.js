@@ -1,7 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { format } from 'date-fns';
+import Spinner from '@/app/_components/Spinner';
 import mapbox from '@/app/_lib/mapbox';
+import PhotoLink from '@/app/_components/PhotoLink';
 
 export default function Page({ params }) {
   const [trip, setTrip] = useState({});
@@ -37,10 +40,29 @@ export default function Page({ params }) {
     travelers,
   } = trip;
 
+  const formattedDate = date ? format(date, 'dd.MM.yyyy') : '';
+
   return (
-    <div className="fixed top-0 left-0 w-screen h-screen">
-      <div className="absolute z-30 md:left-[120px] text-4xl top-8">{name}</div>
-      <div ref={mapContainer} className="h-full" />
-    </div>
+    <>
+      {map.current === null && <Spinner />}
+      <div className="fixed top-0 left-0 w-screen h-screen">
+        <div className="absolute z-50 md:left-[120px] text-4xl top-6 flex flex-col gap-1">
+          <div>{name}</div>
+          {duration && (
+            <div className="text-lg">
+              {formattedDate}, {duration} {duration > 1 ? 'days' : 'day'}
+            </div>
+          )}
+          {travelers?.length && (
+            <div className="flex gap-2">
+              {travelers.map((traveler) => (
+                <PhotoLink user={traveler} />
+              ))}
+            </div>
+          )}
+        </div>
+        <div ref={mapContainer} className="z-30 h-full" />
+      </div>
+    </>
   );
 }

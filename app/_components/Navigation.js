@@ -5,30 +5,28 @@ import { headers } from 'next/headers';
 
 export default async function Navigation() {
   const session = await auth();
-  // console.log('session: ', session);
-
   const user = session?.user;
-  const headersList = headers();
-  // read the custom x-url header (from middleware)
-  const header_url = headersList.get('x-url') || '';
-  const isTripPage = header_url.includes('/trips');
+
+  // const headersList = headers();
+  // // read the custom x-url header (from middleware)
+  // const header_url = headersList.get('x-url') || '';
+  // const isTripPage = header_url.includes('/trips');
+  // console.log('\x1b[36m%s\x1b[0m', 'isTripPage', isTripPage);
 
   return (
-    <nav className="z-10 text-xl">
+    <nav className="text-xl">
       <ul className="flex items-center gap-16">
-        {!isTripPage && (
-          <li>
-            <Link
-              href="/search"
-              className="transition-colors hover:text-accent-400"
-            >
-              Search
-            </Link>
-          </li>
-        )}
-        {user && !isTripPage && (
+        <li>
+          <Link
+            href="/search"
+            className="transition-colors hover:text-accent-400"
+          >
+            Search
+          </Link>
+        </li>
+        {user && (
           <>
-            <li className="hidden lg:block">
+            <li className="hidden lg:block tripHide">
               <Link
                 href={`/collections/${user?.id}`}
                 className="transition-colors hover:text-accent-400"
@@ -36,7 +34,7 @@ export default async function Navigation() {
                 My trips
               </Link>
             </li>
-            <li className="hidden lg:block">
+            <li className="hidden lg:block ">
               <Link
                 href="/friends"
                 className="transition-colors hover:text-accent-400"
@@ -44,7 +42,7 @@ export default async function Navigation() {
                 My friends
               </Link>
             </li>
-            <li className="hidden lg:block">
+            <li className="hidden lg:block ">
               <Link
                 href="/add"
                 className="transition-colors hover:text-accent-400"
@@ -56,7 +54,7 @@ export default async function Navigation() {
         )}
         <li>
           {session?.user?.image ? (
-            <div className="flex gap-3">
+            <div className="z-50 flex gap-3">
               <Link
                 href="/account"
                 className="flex items-center transition-colors hover:text-accent-400"

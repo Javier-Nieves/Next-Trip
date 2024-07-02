@@ -66,10 +66,10 @@ export default async function mapbox({ mapContainer, locations }) {
     // adding padding to the map
     map.fitBounds(bounds, {
       padding: {
-        top: 180,
-        bottom: 180,
-        left: 180,
-        right: 180,
+        top: 120,
+        bottom: 120,
+        left: 120,
+        right: 120,
       },
       duration: 3000,
     });
@@ -199,7 +199,8 @@ function populatePopups(map) {
   });
 }
 
-async function createGeoJSON(map, waypoints) {
+async function createGeoJSON(map, waypoints, mode = 'drive') {
+  // todo - add feature to change mode to 'hike' (less than 100km btw points, change drive to hike)
   let wayPointsString = '';
   waypoints.forEach((place) => {
     wayPointsString += `lonlat:${place.join(',')}|`;
@@ -211,7 +212,7 @@ async function createGeoJSON(map, waypoints) {
   const API_KEY = data.geoKey;
 
   const res = await fetch(
-    `https://api.geoapify.com/v1/routing?waypoints=${wayPointsString}&mode=drive&apiKey=${API_KEY}`,
+    `https://api.geoapify.com/v1/routing?waypoints=${wayPointsString}&mode=${mode}&apiKey=${API_KEY}`,
   );
   const routeData = await res.json();
 
