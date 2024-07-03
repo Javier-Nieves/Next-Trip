@@ -5,7 +5,8 @@
 :root {
   --color-lightest: rgb(255, 255, 233);
   --color-light: rgb(255, 254, 206);
-  --color-base: rgb(255, 254, 172);
+  --color-yellow: rgb(253, 225, 66);
+  --color-light-yellow: rgb(255, 241, 161);
   --color-dark: rgb(216, 214, 112);
   --color-darkest: rgb(171, 170, 59);
   --color-accent-base: rgb(201, 135, 175);
@@ -91,4 +92,8 @@ h1 {
   100% {
     transform: rotate(-360deg);
   }
+}
+
+.mapboxgl-canvas-container {
+  height: 100vh;
 }

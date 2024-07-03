@@ -7,11 +7,8 @@ import { getPublicTrips } from './_lib/data-service';
 
 export default async function Page() {
   // index page renders all public trips when user isn't logged in
-  // todo: + all friends's trips when user is logged in
+  // todo: + all friends's private trips when user is logged in
 
-  // const res = await fetch(`${process.env.SITE_URL}/api/collections`);
-  // const trips = await res.json();
-  // console.log('PAGE!!', trips.status);
   const trips = await getPublicTrips();
 
   return (

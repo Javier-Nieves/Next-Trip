@@ -33,7 +33,7 @@ const tripSchema = new mongoose.Schema({
     type: Date,
     // required: [true, 'A trip must have a date'],
   },
-  duration: String,
+  duration: Number,
   createdBy: String,
   createdAt: {
     type: Date,

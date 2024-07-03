@@ -1,10 +1,12 @@
 import { Raleway } from 'next/font/google';
+import Image from 'next/image';
 import { EdgeStoreProvider } from './_lib/edgestore';
 import Header from './_components/Header';
 import Logo from './_components/Logo';
+import back from '@/public/back.jpg';
 
-import './globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import './globals.css';
 
 const raleway = Raleway({ subsets: ['latin'] });
 
@@ -21,6 +23,14 @@ export default function RootLayout({ children }) {
       <body
         className={`flex relative flex-col min-h-screen antialiased ${raleway.className}`}
       >
+        <Image
+          src={back}
+          placeholder="blur"
+          quality={50}
+          className="absolute top-0 -z-[100]"
+          alt="Background image"
+        />
+
         <Header>
           <Logo />
         </Header>

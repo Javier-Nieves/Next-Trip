@@ -27,7 +27,7 @@ export default function Page() {
     defaultValues: {},
   });
   //   const { errors } = formState;
-  const duration = differenceInDays(range.to, range.from) + 1;
+  const duration = +differenceInDays(range.to, range.from) + 1;
 
   // getting friends info to populate travelers selector and add userId to Trip object
   useEffect(function () {
@@ -97,7 +97,7 @@ export default function Page() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex justify-center flex-col items-center my-3 w-1/2 mx-auto"
+      className="flex flex-col items-center justify-center w-1/2 mx-auto my-3"
     >
       <h1>Create trip</h1>
       <Progress progress={progress} />
@@ -122,8 +122,8 @@ export default function Page() {
           />
         </div>
         <div className="flex items-center justify-center w-1/4">
-          <label className="flex flex-col justity-center items-center cursor-pointer gap-4">
-            <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+          <label className="flex flex-col items-center gap-4 cursor-pointer justity-center">
+            <span className="text-sm font-medium text-gray-900 ms-3 dark:text-gray-300">
               Friends only
             </span>
             <div>
@@ -142,7 +142,7 @@ export default function Page() {
         <div className="flex items-center justify-center w-full">
           <label htmlFor="traveler-input">Travelers:</label>
           <input
-            className="px-5 py-3 shadow-md rounded-xl m-3"
+            className="px-5 py-3 m-3 shadow-md rounded-xl"
             id="traveler-input"
             list="travelers-list"
             value={inputValue}
