@@ -14,22 +14,22 @@ export default async function Navigation() {
   // console.log('\x1b[36m%s\x1b[0m', 'isTripPage', isTripPage);
 
   return (
-    <nav className="text-xl">
+    <nav className="text-2xl font-light">
       <ul className="flex items-center gap-16">
         <li>
           <Link
             href="/search"
-            className="transition-colors hover:text-accent-400"
+            className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-400"
           >
             Search
           </Link>
         </li>
         {user && (
           <>
-            <li className="hidden lg:block tripHide">
+            <li className="hidden lg:block">
               <Link
                 href={`/collections/${user?.id}`}
-                className="transition-colors hover:text-accent-400"
+                className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-400"
               >
                 My trips
               </Link>
@@ -37,7 +37,7 @@ export default async function Navigation() {
             <li className="hidden lg:block ">
               <Link
                 href="/friends"
-                className="transition-colors hover:text-accent-400"
+                className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-400"
               >
                 My friends
               </Link>
@@ -45,7 +45,7 @@ export default async function Navigation() {
             <li className="hidden lg:block ">
               <Link
                 href="/add"
-                className="transition-colors hover:text-accent-400"
+                className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-400"
               >
                 Add trip
               </Link>
@@ -57,7 +57,7 @@ export default async function Navigation() {
             <div className="z-50 flex gap-3">
               <Link
                 href="/account"
-                className="flex items-center transition-colors hover:text-accent-400"
+                className="flex items-center transition-colors hover:text-[var(--color-accent-darkest)] text-stone-400"
               >
                 <img
                   src={session.user.image}
@@ -72,7 +72,7 @@ export default async function Navigation() {
           ) : (
             <Link
               href="/login"
-              className="transition-colors hover:text-accent-400"
+              className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-400"
             >
               Login
             </Link>

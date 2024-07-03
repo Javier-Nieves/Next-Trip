@@ -1,4 +1,4 @@
-import { Inter } from 'next/font/google';
+import { Raleway } from 'next/font/google';
 import { EdgeStoreProvider } from './_lib/edgestore';
 import Header from './_components/Header';
 import Logo from './_components/Logo';
@@ -6,7 +6,7 @@ import Logo from './_components/Logo';
 import './globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const raleway = Raleway({ subsets: ['latin'] });
 
 export const metadata = {
   title: {
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`flex relative flex-col min-h-screen antialiased ${inter.className}`}
+        className={`flex relative flex-col min-h-screen antialiased ${raleway.className}`}
       >
         <Header>
           <Logo />

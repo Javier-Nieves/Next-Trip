@@ -46,10 +46,10 @@ export default function Page({ params }) {
     <>
       {map.current === null && <Spinner />}
       <div className="fixed top-0 left-0 w-screen h-screen">
-        <div className="absolute z-50 md:left-[120px] text-4xl top-6 flex flex-col gap-1">
-          <div>{name}</div>
+        <div className="absolute z-50 md:right-[120px] top-6 flex flex-col gap-2 items-end">
+          <div className="text-4xl font-semibold">{name}</div>
           {duration && (
-            <div className="text-lg">
+            <div className="text-xl font-normal">
               {formattedDate}, {duration} {duration > 1 ? 'days' : 'day'}
             </div>
           )}

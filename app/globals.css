@@ -3,7 +3,15 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
+  --color-lightest: rgb(255, 255, 233);
+  --color-light: rgb(255, 254, 206);
+  --color-base: rgb(255, 254, 172);
+  --color-dark: rgb(216, 214, 112);
+  --color-darkest: rgb(171, 170, 59);
+  --color-accent-base: rgb(201, 135, 175);
+  --color-accent-dark: rgb(170, 88, 138);
+  --color-accent-darkest: rgb(135, 46, 100);
+  /* react */
   --background-start-rgb: 249, 246, 235;
   --background-end-rgb: 159, 159, 147;
   /* react day picker */
@@ -23,12 +31,8 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: linear-gradient(to bottom, transparent, var(--color-light)),
+    var(--color-lightest);
 }
 
 @layer utilities {
