@@ -8,10 +8,10 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
 import { useEdgeStore } from '../_lib/edgestore';
+import { createTrip } from '../_lib/actions';
 import Button from '../_components/Button';
 import Progress from '../_components/Progress';
 import TravelersList from '../_components/TravelersList';
-import { createTrip } from '../_lib/actions';
 
 export default function Page() {
   const initialRange = { from: undefined, to: undefined };

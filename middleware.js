@@ -3,7 +3,7 @@ import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req) {
   // if (req.nextUrl.pathname.includes('/trips')) {
-  // Store current request url in a custom header, which you can read later
+  // Store current request url in a custom header, which can be read later
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set('x-url', req.url);
   // }

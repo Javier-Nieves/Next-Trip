@@ -1,29 +1,16 @@
 import mapboxgl from '!mapbox-gl';
+import { createLocation } from './actions';
 
-export default async function mapbox({ mapContainer, locations }) {
+export default async function mapbox({
+  mapContainer,
+  locations,
+  isEditingSession,
+  isHike,
+}) {
   // waypoints - array for GeoJson creation => routes
   let waypoints = [];
   // features - array for the map.addSource method, contains Locations data
   let features = [];
-
-  function handleGetLocation() {
-    return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            resolve([position.coords.longitude, position.coords.latitude]);
-          },
-          (error) => {
-            console.error(error);
-            // random coordinates in case user doesn't allow geolocation
-            resolve([2.35, 43.225]);
-          },
-        );
-      } else {
-        reject('Geolocation is not supported by this browser.');
-      }
-    });
-  }
 
   // center map to trip locations of user's location
   let center = [];
@@ -34,28 +21,32 @@ export default async function mapbox({ mapContainer, locations }) {
   mapboxgl.accessToken =
     'pk.eyJ1IjoiamF2aWVyLW5pZXZlcyIsImEiOiJjbG5heWppeDUwN2FyMmxwZ2VqZjBxZGdqIn0.jaVtxVlnW5rlkf2jlNVFlg';
 
+  //! creating Map object
   const map = new mapboxgl.Map({
     container: mapContainer,
     style: 'mapbox://styles/mapbox/streets-v12',
     center,
     zoom: 9,
   });
-  // adding scale
+  // adding scale control
   map.addControl(new mapboxgl.ScaleControl());
   // adding zoom buttons
   const zoomPanel = new mapboxgl.NavigationControl({ showCompass: false });
   map.addControl(zoomPanel, 'bottom-left');
   // change cursor
-  map.getCanvas().style.cursor = 'crosshair';
+  if (isEditingSession) map.getCanvas().style.cursor = 'crosshair';
+  else map.getCanvas().style.cursor = 'pointer';
 
   const bounds = new mapboxgl.LngLatBounds();
 
   map.on('load', async () => {
-    // Trip page or Locations page?
-    // if (window.location.href.includes('locations')) {
-    //   mapboxViews.activateGeocoder();
-    //   map.on('click', (e) => mapboxViews.add_marker(e, locationPopupHandler));
-    // }
+    // If editing - add form to add locations
+    if (isEditingSession) {
+      map.on('click', (event) =>
+        addMarker({ map, event, features, waypoints, isHike }),
+      );
+      // map.on('click', (e) => addMarker(map, e, locationPopupHandler, features));
+    }
 
     if (locations.length === 0) return;
     // locations and routes are created on the map via new layers
@@ -74,7 +65,7 @@ export default async function mapbox({ mapContainer, locations }) {
       duration: 3000,
     });
     // getting GeoJSON data for location points
-    const routeData = await createGeoJSON(map, waypoints);
+    const routeData = await createGeoJSON({ map, waypoints, isHike });
     drawRoute(map, routeData);
   });
 
@@ -199,8 +190,8 @@ function populatePopups(map) {
   });
 }
 
-async function createGeoJSON(map, waypoints, mode = 'drive') {
-  // todo - add feature to change mode to 'hike' (less than 100km btw points, change drive to hike)
+async function createGeoJSON({ map, waypoints, isHike }) {
+  // 'hike' === less than 100km btw points
   let wayPointsString = '';
   waypoints.forEach((place) => {
     wayPointsString += `lonlat:${place.join(',')}|`;
@@ -212,7 +203,7 @@ async function createGeoJSON(map, waypoints, mode = 'drive') {
   const API_KEY = data.geoKey;
 
   const res = await fetch(
-    `https://api.geoapify.com/v1/routing?waypoints=${wayPointsString}&mode=${mode}&apiKey=${API_KEY}`,
+    `https://api.geoapify.com/v1/routing?waypoints=${wayPointsString}&mode=${isHike ? 'hike' : 'drive'}&apiKey=${API_KEY}`,
   );
   const routeData = await res.json();
 
@@ -249,3 +240,103 @@ const drawRoute = (map, routeData) => {
   // for Routes layer to be lower than Locations
   map.moveLayer('route-layer', 'locations');
 };
+
+const addMarker = ({ map, event, features, waypoints, isHike }) => {
+  // add marker and form when map is clicked. Add handler to the form
+  // clear all popups opened earlier
+  const oldPopups = document.querySelectorAll('.mapboxgl-popup');
+  oldPopups.forEach((popup) => popup.remove());
+
+  // create new popup
+  const coordinates = event.lngLat;
+  const popup = new mapboxgl.Popup({ closeOnClick: false })
+    .setLngLat(coordinates)
+    .setHTML(markerMarkup)
+    .addTo(map);
+
+  // with handler:
+  document
+    .querySelector('.newLocation__popup-form')
+    .addEventListener('submit', (e) => {
+      e.preventDefault();
+      const coordArray = [popup._lngLat.lng, popup._lngLat.lat];
+      const form = createFormData(coordArray);
+      popup.remove();
+      locationPopupHandler({
+        form,
+        coordArray,
+        map,
+        features,
+        waypoints,
+        isHike,
+      });
+    });
+};
+
+const locationPopupHandler = async ({
+  form,
+  coordArray,
+  map,
+  features,
+  waypoints,
+  isHike,
+}) => {
+  createLocation(form);
+
+  createFeature(
+    {
+      name: form.get('name'),
+      address: form.get('address'),
+      description: form.get('description'),
+      coordinates: coordArray,
+      images: form.get('images'),
+    },
+    features,
+  );
+  createLocationsLayer(map, features);
+  waypoints.push(coordArray);
+  if (waypoints.length > 1) {
+    const geoData = await createGeoJSON({ map, waypoints, isHike });
+    drawRoute(map, geoData);
+  }
+};
+
+const markerMarkup = `<form class='newLocation__popup-form'>
+                        <input type='text' class='newLocation__popup-name' placeholder='Name'>
+                        <input type='text' class='newLocation__popup-address' placeholder='Address'>
+                        <input type='text' class='newLocation__popup-desc' placeholder='Description'>
+                        <input type='file' class='newLocation__input' accept='image/*' id='images' multiple>
+                        <input type='submit' class='newLocation__add-btn' value='Add location'>
+                      </form>`;
+
+const createFormData = (coordArray) => {
+  const form = new FormData();
+  form.append('name', document.querySelector('.newLocation__popup-name').value);
+  // prettier-ignore
+  form.append('address', document.querySelector('.newLocation__popup-address').value);
+  // prettier-ignore
+  form.append('description', document.querySelector('.newLocation__popup-desc').value);
+  form.append('coordinates', coordArray);
+  const images = document.querySelector('#images').files;
+  for (let i = 0; i < images.length; i++) form.append('images', images[i]);
+  return form;
+};
+
+function handleGetLocation() {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve([position.coords.longitude, position.coords.latitude]);
+        },
+        (error) => {
+          console.error(error);
+          // random coordinates in case user doesn't allow geolocation
+          resolve([2.35, 43.225]);
+        },
+      );
+    } else {
+      reject('Geolocation is not supported by this browser.');
+    }
+  });
+}
