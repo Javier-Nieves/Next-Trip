@@ -9,6 +9,7 @@ import { handlers, auth, signIn, signOut } from './auth';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
+import { format } from 'path';
 
 export async function signInAction() {
   await signIn('google', { redirectTo: '/account' });
@@ -22,7 +23,7 @@ export async function createTrip(data) {
   await connectToDatabase();
   // only save fields are allowed:
   // prettier-ignore
-  const filteredBody = filterBody({...data}, 'name', 'date', 'travelers', 'duration',
+  const filteredBody = filterData({...data}, 'name', 'date', 'travelers', 'duration',
     'highlight', 'description', 'private', 'coverImage', 'createdAt', 'createdBy', 'isHike' );
 
   const newTrip = await Trip.create(filteredBody);
@@ -32,7 +33,6 @@ export async function createTrip(data) {
 }
 
 export async function createLocation(data) {
-  console.log('\x1b[36m%s\x1b[0m', 'data', data);
   const headersList = headers();
   // read the custom x-url header
   const header_url = headersList.get('x-url') || '';
@@ -47,23 +47,23 @@ export async function createLocation(data) {
   // todo - add images!
   const rawData = Object.fromEntries(data.entries());
   rawData.coordinates = rawData.coordinates.split(',');
-  const filteredBody = filterBody(
+  const filteredData = filterData(
     rawData,
     'name',
     'address',
     'description',
     'coordinates',
   );
-  const newLocation = await Location.create(filteredBody);
+  const newLocation = await Location.create(filteredData);
   const modTrip = await Trip.findByIdAndUpdate(
     tripId,
-    { $push: { locations: newLocation.id } },
+    { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
     { new: true },
   );
-  // console.log(modTrip);
+  console.log(modTrip);
 }
 
-function filterBody(obj, ...allowedFields) {
+function filterData(obj, ...allowedFields) {
   console.log('filtering', obj);
   // clear all unwanted fields from an object. For security
   const newObj = {};
