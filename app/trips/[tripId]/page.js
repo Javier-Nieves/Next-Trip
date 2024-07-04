@@ -9,7 +9,7 @@ import PhotoLink from '@/app/_components/PhotoLink';
 export default function Page({ params }) {
   const [trip, setTrip] = useState({});
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [isEditingSession, setIsEditingSession] = useState(true);
+  const [isEditingSession, setIsEditingSession] = useState(false);
   const [isHike, setIsHike] = useState(false);
 
   const mapContainer = useRef(null);
@@ -98,7 +98,7 @@ export default function Page({ params }) {
             </button>
           )}
 
-          {isEditingSession && (
+          {isMyTrip.current && isEditingSession && (
             <div className="flex items-center mt-2 space-x-2">
               <span
                 className={`text-xl font-medium ${isHike ? 'text-black' : 'text-gray-500'}`}

@@ -23,7 +23,7 @@ export async function createTrip(data) {
   // only save fields are allowed:
   // prettier-ignore
   const filteredBody = filterBody({...data}, 'name', 'date', 'travelers', 'duration',
-    'highlight', 'description', 'private', 'coverImage', 'createdAt', 'createdBy' );
+    'highlight', 'description', 'private', 'coverImage', 'createdAt', 'createdBy', 'isHike' );
 
   const newTrip = await Trip.create(filteredBody);
   // console.log(newTrip);
@@ -32,6 +32,7 @@ export async function createTrip(data) {
 }
 
 export async function createLocation(data) {
+  console.log('\x1b[36m%s\x1b[0m', 'data', data);
   const headersList = headers();
   // read the custom x-url header
   const header_url = headersList.get('x-url') || '';

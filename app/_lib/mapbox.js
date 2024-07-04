@@ -281,6 +281,7 @@ const locationPopupHandler = async ({
   waypoints,
   isHike,
 }) => {
+  form.append('isHike', isHike);
   createLocation(form);
 
   createFeature(

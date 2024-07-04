@@ -43,6 +43,10 @@ const tripSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isHike: {
+    type: Boolean,
+    default: false,
+  },
   locations: [
     {
       type: mongoose.Schema.Types.ObjectId,
