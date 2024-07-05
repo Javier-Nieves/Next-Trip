@@ -9,6 +9,7 @@ import PhotoLink from '@/app/_components/PhotoLink';
 export default function Page({ params }) {
   const [trip, setTrip] = useState({});
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [locationInfoOpen, setLocationInfoOpen] = useState(null);
   const [isEditingSession, setIsEditingSession] = useState(false);
   const [isHike, setIsHike] = useState(false);
 
@@ -16,16 +17,15 @@ export default function Page({ params }) {
   const map = useRef(null);
   const isMyTrip = useRef(null);
 
-  //! get trip info & display map
+  // get trip info & display map
   useEffect(
     function () {
       async function displayMap() {
         const res = await fetch(`/api/trips/${params.tripId}`);
         const data = await res.json();
         setTrip(data.data.trip);
-        // console.log('\x1b[36m%s\x1b[0m', 'front trip', data.data.trip);
+        setIsHike(() => data.data.trip.isHike);
         isMyTrip.current = data.data.isMyTrip;
-
         // map container should be empty to render a new map (with editing)
         if (map.current) mapContainer.current.innerHTML = '';
         map.current = mapbox({
@@ -33,6 +33,7 @@ export default function Page({ params }) {
           locations: data.data.trip.locations,
           isEditingSession,
           isHike,
+          setLocationInfoOpen,
         });
       }
       displayMap();
@@ -54,6 +55,8 @@ export default function Page({ params }) {
   const formattedDate = date ? format(date, 'dd.MM.yyyy') : '';
   const hasDate = typeof duration === 'number' && !Number.isNaN(+duration);
 
+  console.log(locationInfoOpen);
+
   return (
     <>
       {map.current === null && <Spinner />}
@@ -73,7 +76,7 @@ export default function Page({ params }) {
           </div>
         )}
 
-        <div className="absolute z-50 right-5 md:right-[20px] lg:right-[100px] top-6 flex flex-col gap-2 items-end">
+        <div className="absolute z-50 right-5 md:right-[20px] lg:right-[100px] top-6 flex flex-col     gap-2 items-end">
           <div className="text-4xl font-semibold">{name}</div>
           {hasDate && (
             <div className="text-xl font-normal">

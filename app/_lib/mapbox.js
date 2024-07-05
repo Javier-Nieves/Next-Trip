@@ -6,6 +6,7 @@ export default async function mapbox({
   locations,
   isEditingSession,
   isHike,
+  setLocationInfoOpen,
 }) {
   // waypoints - array for GeoJson creation => routes
   let waypoints = [];
@@ -53,7 +54,7 @@ export default async function mapbox({
     // layers use Sourses, which are filled from arrays:
     fillGeoArrays(locations, bounds, waypoints, features);
     createLocationsLayer(map, features);
-    populatePopups(map);
+    populatePopups({ map, setLocationInfoOpen });
     // adding padding to the map
     map.fitBounds(bounds, {
       padding: {
@@ -67,9 +68,8 @@ export default async function mapbox({
     // getting GeoJSON data for location points
     const routeData = await createGeoJSON({ map, waypoints, isHike });
     drawRoute(map, routeData);
+    return map;
   });
-
-  return { map, bounds };
 }
 
 function fillGeoArrays(locations, bounds, waypoints, features) {
@@ -166,7 +166,7 @@ function createLocationsLayer(map, features) {
   });
 }
 
-function populatePopups(map) {
+function populatePopups({ map, setLocationInfoOpen }) {
   const popup = new mapboxgl.Popup({
     closeButton: false,
     closeOnClick: false,
@@ -185,8 +185,9 @@ function populatePopups(map) {
   });
   // clicking on the Location
   map.on('click', 'locations', (e) => {
-    // todo
-    // mapboxViews.displayLocationInfo(e.features[0].properties);
+    const locationInfo = e.features[0].properties;
+    // console.log('\x1b[36m%s\x1b[0m', 'loc', locationInfo);
+    setLocationInfoOpen(() => locationInfo);
   });
 }
 
@@ -207,8 +208,7 @@ async function createGeoJSON({ map, waypoints, isHike }) {
   );
   const routeData = await res.json();
 
-  // console.log(routeData);
-  https: if (!map.getSource('route'))
+  if (!map.getSource('route'))
     map.addSource('route', {
       type: 'geojson',
       data: routeData,

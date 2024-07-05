@@ -53,8 +53,12 @@ export async function createLocation(data) {
     'address',
     'description',
     'coordinates',
+    'isHike',
   );
   const newLocation = await Location.create(filteredData);
+  console.log('!!!!:', filteredData);
+  console.log('!!!!:', filteredData.isHike);
+
   const modTrip = await Trip.findByIdAndUpdate(
     tripId,
     { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
