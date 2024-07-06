@@ -7,6 +7,7 @@ export default async function mapbox({
   isEditingSession,
   isHike,
   setLocationInfoOpen,
+  edgestore,
 }) {
   // waypoints - array for GeoJson creation => routes
   let waypoints = [];
@@ -44,7 +45,7 @@ export default async function mapbox({
     // If editing - add form to add locations
     if (isEditingSession) {
       map.on('click', (event) =>
-        addMarker({ map, event, features, waypoints, isHike }),
+        addMarker({ map, event, features, waypoints, isHike, edgestore }),
       );
       // map.on('click', (e) => addMarker(map, e, locationPopupHandler, features));
     }
@@ -241,7 +242,7 @@ const drawRoute = (map, routeData) => {
   map.moveLayer('route-layer', 'locations');
 };
 
-const addMarker = ({ map, event, features, waypoints, isHike }) => {
+function addMarker({ map, event, features, waypoints, isHike, edgestore }) {
   // add marker and form when map is clicked. Add handler to the form
   // clear all popups opened earlier
   const oldPopups = document.querySelectorAll('.mapboxgl-popup');
@@ -269,9 +270,10 @@ const addMarker = ({ map, event, features, waypoints, isHike }) => {
         features,
         waypoints,
         isHike,
+        edgestore,
       });
     });
-};
+}
 
 const locationPopupHandler = async ({
   form,
@@ -280,8 +282,21 @@ const locationPopupHandler = async ({
   features,
   waypoints,
   isHike,
+  edgestore,
 }) => {
   form.append('isHike', isHike);
+  // console.log('form', form);
+  if (form.has('images')) {
+    const file = form.get('images');
+    // uploading picture to EdgeStore
+    // todo - upload multiple files. Limit size to 2 Mb
+    const res = await edgestore.publicFiles.upload({
+      file,
+      // onProgressChange: (progress) => setProgress(progress),
+    });
+    // console.log('\x1b[36m%s\x1b[0m', 'res', res);
+    form.append('imageUrl', res.url);
+  }
   createLocation(form);
 
   createFeature(

@@ -62,7 +62,7 @@ export default function Page() {
       coverImage,
       createdAt: new Date(),
     };
-    console.log('data', completeData);
+    // console.log('data', completeData);
     await createTrip(completeData);
     // clear form
     reset();

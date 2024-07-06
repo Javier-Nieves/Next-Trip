@@ -38,6 +38,8 @@ export async function createLocation(data) {
   const header_url = headersList.get('x-url') || '';
   const tripId = header_url.split('/').at(-1);
 
+  // console.log('data:::', data);
+
   // check if trip is created by logged in user
   await connectToDatabase();
   const trip = await Trip.findById(tripId);
@@ -47,6 +49,7 @@ export async function createLocation(data) {
   // todo - add images!
   const rawData = Object.fromEntries(data.entries());
   rawData.coordinates = rawData.coordinates.split(',');
+  rawData.images = [rawData.imageUrl];
   const filteredData = filterData(
     rawData,
     'name',
@@ -54,21 +57,20 @@ export async function createLocation(data) {
     'description',
     'coordinates',
     'isHike',
+    'images',
   );
   const newLocation = await Location.create(filteredData);
-  console.log('!!!!:', filteredData);
-  console.log('!!!!:', filteredData.isHike);
 
   const modTrip = await Trip.findByIdAndUpdate(
     tripId,
     { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
     { new: true },
   );
-  console.log(modTrip);
+  // console.log(modTrip);
 }
 
 function filterData(obj, ...allowedFields) {
-  console.log('filtering', obj);
+  // console.log('filtering', obj);
   // clear all unwanted fields from an object. For security
   const newObj = {};
   Object.keys(obj).forEach((el) => {
