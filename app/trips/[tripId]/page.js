@@ -2,41 +2,61 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
+import mapboxgl from '!mapbox-gl';
+import { centeredMap, createFeature, createGeoJSON } from '@/app/_lib/mapbox';
 import { useEdgeStore } from '@/app/_lib/edgestore';
 import Spinner from '@/app/_components/Spinner';
-import mapbox from '@/app/_lib/mapbox';
+import TripDescription from '@/app/_components/TripDescription';
 import PhotoLink from '@/app/_components/PhotoLink';
 
 export default function Page({ params }) {
+  // todo - useReducer
   const { edgestore } = useEdgeStore();
+  const [mapIsLoading, setMapIsLoading] = useState(false);
   const [trip, setTrip] = useState({});
-  const [detailsOpen, setDetailsOpen] = useState(false);
-  const [locationInfoOpen, setLocationInfoOpen] = useState(null);
   const [isEditingSession, setIsEditingSession] = useState(false);
+  const [locationInfo, setLocationInfo] = useState(null);
   const [isHike, setIsHike] = useState(false);
+
+  const [locations, setLocations] = useState([]);
+  // waypoints - array for GeoJson creation => routes
+  const [waypoints, setWaypoints] = useState([]);
+  // features - array for the map.addSource method, contains Locations data
+  const [features, setFeatures] = useState([]);
 
   const mapContainer = useRef(null);
   const map = useRef(null);
   const isMyTrip = useRef(null);
 
-  // get trip info & display map
+  // 0) get trip info & display map
   useEffect(
     function () {
       async function displayMap() {
+        // console.log('\x1b[33m%s\x1b[0m', 'Effect0 trip-map');
+        // get trip info
         const res = await fetch(`/api/trips/${params.tripId}`);
         const data = await res.json();
         setTrip(data.data.trip);
         setIsHike(() => data.data.trip.isHike);
         isMyTrip.current = data.data.isMyTrip;
+        setLocations(data.data.trip.locations);
         // map container should be empty to render a new map (with editing)
-        if (map.current) mapContainer.current.innerHTML = '';
-        map.current = mapbox({
+        // if (map.current) mapContainer.current.innerHTML = '';
+        if (map.current || mapIsLoading) return;
+        setMapIsLoading(true);
+        map.current = await centeredMap({
           mapContainer: mapContainer.current,
-          locations: data.data.trip.locations,
+          hasLocations: Boolean(locations),
           isEditingSession,
-          isHike,
-          setLocationInfoOpen,
-          edgestore,
+        });
+
+        map.current?.on('load', async () => {
+          // If editing - add form to add locations
+          if (isEditingSession) {
+            //   map.current.on('click', (event) =>
+            //     addMarker({ map, event, features, waypoints, isHike, edgestore }),
+            //   );
+          }
         });
       }
       displayMap();
@@ -44,39 +64,181 @@ export default function Page({ params }) {
     [isEditingSession, isHike],
   );
 
-  const {
-    coverImage,
-    date,
-    description,
-    duration,
-    highlight,
-    locations,
-    name,
-    travelers,
-  } = trip;
+  // 1
+  useEffect(() => {
+    if (locations.length > 0) {
+      //   console.log('\x1b[33m%s\x1b[0m', 'Effect1 - arrays');
+      // locations and routes are created on the map via new layers
+      // layers use Sourses, which are filled from arrays:
+      fillGeoArrays(locations);
+    }
+  }, [locations]);
+  // 2
+  useEffect(() => {
+    if (features.length > 0) {
+      //   console.log('\x1b[33m%s\x1b[0m', 'Effect2 - location layer');
+      createLocationsLayer();
+      populatePopups();
+    }
+  }, [features]);
 
+  // 3 getting GeoJSON data for location points
+  useEffect(
+    function () {
+      async function plotPath() {
+        // if (!map.current) return;
+        if (!waypoints.length) return;
+        const routeData = await createGeoJSON(waypoints, isHike);
+
+        if (!map.current?.getSource('route'))
+          map.current?.addSource('route', {
+            type: 'geojson',
+            data: routeData,
+          });
+        else map.current?.getSource('route').setData(routeData);
+        drawRoute(routeData);
+      }
+      plotPath();
+    },
+    [waypoints, isHike],
+  );
+
+  function fillGeoArrays(locations) {
+    const bounds = new mapboxgl.LngLatBounds();
+    // create an array for future map.addSource method
+    // and waypoints array for Routes drawing
+    let newWaypoints = [];
+    let newFeatures = [];
+    locations.forEach((loc) => {
+      const newFeature = createFeature({
+        name: loc.name,
+        address: loc.address,
+        description: loc.description,
+        coordinates: loc.coordinates,
+        images: loc.images,
+        id: loc._id,
+      });
+      newFeatures.push(newFeature);
+      newWaypoints.push(loc.coordinates);
+      bounds.extend(loc.coordinates);
+      // adding padding to the map
+      map.current?.fitBounds(bounds, {
+        padding: {
+          top: 120,
+          bottom: 120,
+          left: 120,
+          right: 120,
+        },
+        duration: 3000,
+      });
+    });
+    setWaypoints(() => [...newWaypoints]);
+    setFeatures(() => [...newFeatures]);
+  }
+
+  function createLocationsLayer() {
+    // console.log('\x1b[36m%s\x1b[0m', 'createLocationsLayer', features);
+    map.current?.on('load', () => {
+      // creating or updating layer's source
+      if (!map.current.getSource('locations')) {
+        map.current.addSource('locations', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features,
+          },
+        });
+      } else {
+        map.current.getSource('locations').setData({
+          type: 'FeatureCollection',
+          features,
+        });
+      }
+      // creating Locations layer
+      if (!map.current.getLayer('locations')) {
+        map.current.addLayer({
+          id: 'locations',
+          type: 'circle',
+          source: 'locations',
+          paint: {
+            'circle-color': '#000012',
+            'circle-radius': 6,
+            'circle-stroke-width': 2,
+            'circle-stroke-color': '#ffffff',
+          },
+        });
+      }
+      // center map.current on clicked location (with padding to the right)
+      map.current.on('click', 'locations', (e) => {
+        map.current.easeTo({
+          center: e.features[0].geometry.coordinates,
+          padding: { right: window.innerWidth * 0.5 },
+          duration: 1000,
+        });
+      });
+    });
+  }
+
+  function populatePopups() {
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false,
+    });
+    map.current?.on('mouseenter', 'locations', (e) => {
+      map.current.getCanvas().style.cursor = 'pointer';
+      const coordinates = e.features[0].geometry.coordinates.slice();
+      const description = e.features[0].properties.description;
+      // Populate the popup and set its coordinates
+      popup.setLngLat(coordinates).setHTML(description).addTo(map.current);
+    });
+    // hide popup when cursor leaves
+    map.current?.on('mouseleave', 'locations', () => {
+      map.current.getCanvas().style.cursor = 'crosshair';
+      popup.remove();
+    });
+    // clicking on the Location
+    map.current?.on('click', 'locations', (e) => {
+      const locationInfo = e.features[0].properties;
+      // console.log('\x1b[36m%s\x1b[0m', 'loc', locationInfo);
+      setLocationInfo(() => locationInfo);
+    });
+  }
+
+  function drawRoute(routeData) {
+    if (!routeData) return;
+    if (map.current.getLayer('route-layer'))
+      map.current.removeLayer('route-layer');
+
+    map.current.getSource('route').setData(routeData);
+    map.current.addLayer({
+      id: 'route-layer',
+      type: 'line',
+      source: 'route',
+      layout: {
+        'line-cap': 'round',
+        'line-join': 'round',
+      },
+      paint: {
+        'line-color': '#a80202',
+        'line-width': 3,
+      },
+      filter: ['==', '$type', 'LineString'],
+    });
+    // for Routes layer to be lower than Locations
+    // map.current.moveLayer('route-layer', 'locations');
+  }
+
+  // prettier-ignore
+  const { coverImage, date, description, duration, highlight, name, travelers } = trip;
   const formattedDate = date ? format(date, 'dd.MM.yyyy') : '';
   const hasDate = typeof duration === 'number' && !Number.isNaN(+duration);
-
-  //   console.log(locationInfoOpen);
 
   return (
     <>
       {map.current === null && <Spinner />}
       <div className="fixed top-0 left-0 w-screen h-screen">
         {(highlight || description) && !isEditingSession && (
-          <div
-            onClick={() => setDetailsOpen((cur) => !cur)}
-            className={`${detailsOpen ? 'bg-[var(--color-light-yellow)] w-[400px] left-[50px] h-[450px]' : 'bg-[var(--color-yellow)] w-[150px] left-[100px] h-[50px]'} absolute z-50 top-[100px] px-4 py-3 rounded-md text-xl font-medium hover:bg-[var(--color-light-yellow)] text-center transition-all duration-500 md:block hidden`}
-          >
-            {!detailsOpen && (highlight || description) && 'Trip details'}
-            {detailsOpen && (
-              <div>
-                <h1>{highlight}</h1>
-                <p>{description}</p>
-              </div>
-            )}
-          </div>
+          <TripDescription highlight={highlight} description={description} />
         )}
 
         <div className="absolute z-50 right-5 md:right-[20px] lg:right-[100px] top-6 flex flex-col     gap-2 items-end">
@@ -127,29 +289,8 @@ export default function Page({ params }) {
             </div>
           )}
         </div>
-        {locationInfoOpen && (
-          <div className="absolute z-50 h-1/2 w-[400px] bg-[var(--color-accent-base)] p-4 rounded-lg  flex flex-col items-center transform translate-y-1/2 right-[6rem] gap-4">
-            <button
-              onClick={() => setLocationInfoOpen(null)}
-              className="absolute top-3 right-3"
-            >
-              &#10005;
-            </button>
-            <p className="text-3xl">{locationInfoOpen.name}</p>
-            <p className="grid grid-cols-[100px,1fr] w-full text-lg">
-              <span>Address: </span>
-              <span>{locationInfoOpen.address || ' -'}</span>
-            </p>
-            <p className="grid grid-cols-[100px,1fr] w-full text-lg">
-              <span>Description: </span>
-              <span>{locationInfoOpen.desc || ' -'}</span>
-            </p>
-            <p className="grid grid-cols-[100px,1fr] w-full text-lg">
-              <span>Images:</span>
-              <span className="grid">{locationInfoOpen.images}</span>
-            </p>
-          </div>
-        )}
+
+        {/* {locationInfoOpen && <LocationInfo location={locationInfo}/>} */}
         <div ref={mapContainer} className="z-30 w-full h-full" />
       </div>
     </>
