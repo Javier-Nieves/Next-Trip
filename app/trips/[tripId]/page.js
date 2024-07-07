@@ -1,13 +1,17 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import mapboxgl from '!mapbox-gl';
-import { centeredMap, createFeature, createGeoJSON } from '@/app/_lib/mapbox';
+// prettier-ignore
+import { centeredMap, createFeature, createGeoJSON, 
+            markerMarkup, createFormData, locationPopupHandler } from '@/app/_lib/mapbox';
 import { useEdgeStore } from '@/app/_lib/edgestore';
 import Spinner from '@/app/_components/Spinner';
 import TripDescription from '@/app/_components/TripDescription';
 import PhotoLink from '@/app/_components/PhotoLink';
+
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Page({ params }) {
   // todo - useReducer
@@ -15,6 +19,7 @@ export default function Page({ params }) {
   const [mapIsLoading, setMapIsLoading] = useState(false);
   const [trip, setTrip] = useState({});
   const [isEditingSession, setIsEditingSession] = useState(false);
+  const [regenerateMap, setRegenerateMap] = useState(false);
   const [locationInfo, setLocationInfo] = useState(null);
   const [isHike, setIsHike] = useState(false);
 
@@ -32,7 +37,7 @@ export default function Page({ params }) {
   useEffect(
     function () {
       async function displayMap() {
-        // console.log('\x1b[33m%s\x1b[0m', 'Effect0 trip-map');
+        if (mapIsLoading) return;
         // get trip info
         const res = await fetch(`/api/trips/${params.tripId}`);
         const data = await res.json();
@@ -41,33 +46,77 @@ export default function Page({ params }) {
         isMyTrip.current = data.data.isMyTrip;
         setLocations(data.data.trip.locations);
         // map container should be empty to render a new map (with editing)
-        // if (map.current) mapContainer.current.innerHTML = '';
-        if (map.current || mapIsLoading) return;
-        setMapIsLoading(true);
-        map.current = await centeredMap({
-          mapContainer: mapContainer.current,
-          hasLocations: Boolean(locations),
-          isEditingSession,
-        });
-
-        map.current?.on('load', async () => {
-          // If editing - add form to add locations
-          if (isEditingSession) {
-            //   map.current.on('click', (event) =>
-            //     addMarker({ map, event, features, waypoints, isHike, edgestore }),
-            //   );
-          }
-        });
+        if (map.current && !regenerateMap) return;
+        if (regenerateMap) {
+          // when editing session if over => regenerate map without click handler
+          mapContainer.current.innerHTML = '';
+          setRegenerateMap(() => false);
+        }
+        setMapIsLoading(() => true);
+        map.current = await centeredMap(mapContainer.current, locations);
+        setMapIsLoading(() => false);
       }
       displayMap();
     },
-    [isEditingSession, isHike],
+    [isEditingSession],
+  );
+
+  // 0.5) convert map to editing if needed
+  useEffect(
+    function () {
+      async function convertToEditing() {
+        if (!map.current) return;
+        function handleClick(event) {
+          // clear all popups opened earlier
+          const oldPopups = document.querySelectorAll('.mapboxgl-popup');
+          oldPopups.forEach((popup) => popup.remove());
+          // add new popup
+          const coordinates = event.lngLat;
+          const popup = new mapboxgl.Popup({ closeOnClick: false })
+            .setLngLat(coordinates)
+            .setHTML(markerMarkup)
+            .addTo(map.current);
+          // add handler to the popup form:
+          document
+            .querySelector('.newLocation__popup-form')
+            .addEventListener('submit', async (e) => {
+              e.preventDefault();
+              const coordArray = [popup._lngLat.lng, popup._lngLat.lat];
+              const form = createFormData(coordArray, isHike);
+              popup.remove();
+              // upload images, create Location document in the DB:
+              locationPopupHandler(form, edgestore);
+              // update map on screen
+              createFeature({
+                name: form.get('name'),
+                address: form.get('address'),
+                description: form.get('description'),
+                coordinates: coordArray,
+                images: form.get('images'),
+              });
+              createLocationsLayer();
+              setWaypoints((cur) => [...cur, coordArray]);
+              // plot route if there are more then 2 locations in a trip
+              if (waypoints.length > 1) {
+                const geoData = await createGeoJSON(waypoints, isHike);
+                drawRoute(geoData);
+              }
+            });
+        }
+        if (isEditingSession) {
+          // If editing - add form to create locations
+          map.current.on('click', handleClick);
+          map.current.getCanvas().style.cursor = 'crosshair';
+        }
+      }
+      convertToEditing();
+    },
+    [isEditingSession, waypoints, isHike],
   );
 
   // 1
   useEffect(() => {
     if (locations.length > 0) {
-      //   console.log('\x1b[33m%s\x1b[0m', 'Effect1 - arrays');
       // locations and routes are created on the map via new layers
       // layers use Sourses, which are filled from arrays:
       fillGeoArrays(locations);
@@ -75,12 +124,11 @@ export default function Page({ params }) {
   }, [locations]);
   // 2
   useEffect(() => {
-    if (features.length > 0) {
-      //   console.log('\x1b[33m%s\x1b[0m', 'Effect2 - location layer');
+    if (features.length > 0 || !mapIsLoading) {
       createLocationsLayer();
       populatePopups();
     }
-  }, [features]);
+  }, [features, mapIsLoading]);
 
   // 3 getting GeoJSON data for location points
   useEffect(
@@ -120,8 +168,8 @@ export default function Page({ params }) {
       });
       newFeatures.push(newFeature);
       newWaypoints.push(loc.coordinates);
+      // showing all locations + adding padding to the map
       bounds.extend(loc.coordinates);
-      // adding padding to the map
       map.current?.fitBounds(bounds, {
         padding: {
           top: 120,
@@ -137,7 +185,6 @@ export default function Page({ params }) {
   }
 
   function createLocationsLayer() {
-    // console.log('\x1b[36m%s\x1b[0m', 'createLocationsLayer', features);
     map.current?.on('load', () => {
       // creating or updating layer's source
       if (!map.current.getSource('locations')) {
@@ -199,13 +246,13 @@ export default function Page({ params }) {
     // clicking on the Location
     map.current?.on('click', 'locations', (e) => {
       const locationInfo = e.features[0].properties;
-      // console.log('\x1b[36m%s\x1b[0m', 'loc', locationInfo);
       setLocationInfo(() => locationInfo);
     });
   }
 
   function drawRoute(routeData) {
     if (!routeData) return;
+    if (!map.current) return;
     if (map.current.getLayer('route-layer'))
       map.current.removeLayer('route-layer');
 
@@ -225,7 +272,11 @@ export default function Page({ params }) {
       filter: ['==', '$type', 'LineString'],
     });
     // for Routes layer to be lower than Locations
-    // map.current.moveLayer('route-layer', 'locations');
+    if (
+      map.current.getLayer('route-layer') &&
+      map.current.getLayer('locations')
+    )
+      map.current.moveLayer('route-layer', 'locations');
   }
 
   // prettier-ignore
@@ -235,7 +286,7 @@ export default function Page({ params }) {
 
   return (
     <>
-      {map.current === null && <Spinner />}
+      {(map.current === null || mapIsLoading) && <Spinner />}
       <div className="fixed top-0 left-0 w-screen h-screen">
         {(highlight || description) && !isEditingSession && (
           <TripDescription highlight={highlight} description={description} />
@@ -259,7 +310,10 @@ export default function Page({ params }) {
 
           {isMyTrip.current && (
             <button
-              onClick={() => setIsEditingSession((cur) => !cur)}
+              onClick={() => {
+                isEditingSession && setRegenerateMap(() => true);
+                setIsEditingSession((cur) => !cur);
+              }}
               className={`${isEditingSession ? 'bg-[var(--color-accent-base)] hover:bg-[var(--color-accent-dark)]' : 'bg-[var(--color-light-yellow)] hover:bg-[var(--color-yellow)]'} p-2 mt-2 rounded-md text-lg`}
             >
               {isEditingSession ? 'Back to trip' : 'Edit locations'}

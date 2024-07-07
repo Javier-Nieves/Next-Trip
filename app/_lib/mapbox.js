@@ -1,15 +1,11 @@
 import mapboxgl from '!mapbox-gl';
 import { createLocation } from './actions';
 
-export async function centeredMap({
-  mapContainer,
-  hasLocations,
-  isEditingSession,
-}) {
+export async function centeredMap(mapContainer, locations) {
   // center map to trip locations of user's location
   let center = [];
-  if (!hasLocations) center = await handleGetLocation();
-  // else center = [locations[0].coordinates[0], locations[0].coordinates[1]];
+  if (!locations.length) center = await handleGetLocation();
+  else center = [locations[0].coordinates[0], locations[0].coordinates[1]];
 
   // PUBLIC ACCESS TOKEN:
   mapboxgl.accessToken =
@@ -19,17 +15,19 @@ export async function centeredMap({
   const map = new mapboxgl.Map({
     container: mapContainer,
     style: 'mapbox://styles/mapbox/streets-v12',
-    // center,
+    center,
     zoom: 9,
   });
+
   // adding scale control
   map.addControl(new mapboxgl.ScaleControl());
   // adding zoom buttons
   const zoomPanel = new mapboxgl.NavigationControl({ showCompass: false });
   map.addControl(zoomPanel, 'bottom-left');
   // change cursor
-  if (isEditingSession) map.getCanvas().style.cursor = 'crosshair';
-  else map.getCanvas().style.cursor = 'pointer';
+  // if (isEditingSession) map.getCanvas().style.cursor = 'crosshair';
+  // else map.getCanvas().style.cursor = 'pointer';
+  map.getCanvas().style.cursor = 'pointer';
 
   return map;
 }
@@ -59,7 +57,7 @@ export const createFeature = (loc) => {
   };
 };
 
-export async function createGeoJSON(waypoints, isHike = false) {
+export async function createGeoJSON(waypoints, isHike) {
   // 'hike' === less than 100km btw points
   let wayPointsString = '';
   waypoints.forEach((place) => {
@@ -70,7 +68,6 @@ export async function createGeoJSON(waypoints, isHike = false) {
   const keyData = await fetch('/api/trips');
   const data = await keyData.json();
   const API_KEY = data.geoKey;
-
   const res = await fetch(
     `https://api.geoapify.com/v1/routing?waypoints=${wayPointsString}&mode=${isHike ? 'hike' : 'drive'}&apiKey=${API_KEY}`,
   );
@@ -78,7 +75,7 @@ export async function createGeoJSON(waypoints, isHike = false) {
   return routeData;
 }
 
-function addMarker({ map, event, features, waypoints, isHike, edgestore }) {
+export function addMarker(event, isHike, edgestore) {
   // add marker and form when map is clicked. Add handler to the form
   // clear all popups opened earlier
   const oldPopups = document.querySelectorAll('.mapboxgl-popup');
@@ -111,17 +108,7 @@ function addMarker({ map, event, features, waypoints, isHike, edgestore }) {
     });
 }
 
-const locationPopupHandler = async ({
-  form,
-  coordArray,
-  map,
-  features,
-  waypoints,
-  isHike,
-  edgestore,
-}) => {
-  form.append('isHike', isHike);
-  // console.log('form', form);
+export async function locationPopupHandler(form, edgestore) {
   if (form.has('images')) {
     const file = form.get('images');
     // uploading picture to EdgeStore
@@ -130,30 +117,12 @@ const locationPopupHandler = async ({
       file,
       // onProgressChange: (progress) => setProgress(progress),
     });
-    // console.log('\x1b[36m%s\x1b[0m', 'res', res);
     form.append('imageUrl', res.url);
   }
   createLocation(form);
+}
 
-  createFeature(
-    {
-      name: form.get('name'),
-      address: form.get('address'),
-      description: form.get('description'),
-      coordinates: coordArray,
-      images: form.get('images'),
-    },
-    features,
-  );
-  createLocationsLayer(map, features);
-  waypoints.push(coordArray);
-  if (waypoints.length > 1) {
-    const geoData = await createGeoJSON({ map, waypoints, isHike });
-    drawRoute(map, geoData);
-  }
-};
-
-const markerMarkup = `<form class='newLocation__popup-form'>
+export const markerMarkup = `<form class='newLocation__popup-form'>
                         <input type='text' class='newLocation__popup-name' placeholder='Name'>
                         <input type='text' class='newLocation__popup-address' placeholder='Address'>
                         <input type='text' class='newLocation__popup-desc' placeholder='Description'>
@@ -161,7 +130,7 @@ const markerMarkup = `<form class='newLocation__popup-form'>
                         <input type='submit' class='newLocation__add-btn' value='Add location'>
                       </form>`;
 
-const createFormData = (coordArray) => {
+export const createFormData = (coordArray, isHike = false) => {
   const form = new FormData();
   form.append('name', document.querySelector('.newLocation__popup-name').value);
   // prettier-ignore
@@ -169,6 +138,7 @@ const createFormData = (coordArray) => {
   // prettier-ignore
   form.append('description', document.querySelector('.newLocation__popup-desc').value);
   form.append('coordinates', coordArray);
+  form.append('isHike', isHike);
   const images = document.querySelector('#images').files;
   for (let i = 0; i < images.length; i++) form.append('images', images[i]);
   return form;
