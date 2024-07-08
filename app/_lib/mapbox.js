@@ -75,39 +75,6 @@ export async function createGeoJSON(waypoints, isHike) {
   return routeData;
 }
 
-export function addMarker(event, isHike, edgestore) {
-  // add marker and form when map is clicked. Add handler to the form
-  // clear all popups opened earlier
-  const oldPopups = document.querySelectorAll('.mapboxgl-popup');
-  oldPopups.forEach((popup) => popup.remove());
-
-  // create new popup
-  const coordinates = event.lngLat;
-  const popup = new mapboxgl.Popup({ closeOnClick: false })
-    .setLngLat(coordinates)
-    .setHTML(markerMarkup)
-    .addTo(map);
-
-  // with handler:
-  document
-    .querySelector('.newLocation__popup-form')
-    .addEventListener('submit', (e) => {
-      e.preventDefault();
-      const coordArray = [popup._lngLat.lng, popup._lngLat.lat];
-      const form = createFormData(coordArray);
-      popup.remove();
-      locationPopupHandler({
-        form,
-        coordArray,
-        map,
-        features,
-        waypoints,
-        isHike,
-        edgestore,
-      });
-    });
-}
-
 export async function locationPopupHandler(form, edgestore) {
   if (form.has('images')) {
     const file = form.get('images');
@@ -123,11 +90,11 @@ export async function locationPopupHandler(form, edgestore) {
 }
 
 export const markerMarkup = `<form class='newLocation__popup-form'>
-                        <input type='text' class='newLocation__popup-name' placeholder='Name'>
-                        <input type='text' class='newLocation__popup-address' placeholder='Address'>
-                        <input type='text' class='newLocation__popup-desc' placeholder='Description'>
-                        <input type='file' class='newLocation__input' accept='image/*' id='images' multiple>
-                        <input type='submit' class='newLocation__add-btn' value='Add location'>
+                        <input type='text' class='newLocation__popup-name' placeholder='Name' required />
+                        <input type='text' class='newLocation__popup-address' placeholder='Address' />
+                        <input type='text' class='newLocation__popup-desc' placeholder='Description' />
+                        <input type='file' class='newLocation__input' accept='image/*' id='images' multiple />
+                        <input type='submit' class='newLocation__add-btn' value='Add location' />
                       </form>`;
 
 export const createFormData = (coordArray, isHike = false) => {
