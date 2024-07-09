@@ -33,39 +33,38 @@ export async function createTrip(data) {
 }
 
 export async function createLocation(data) {
-  const headersList = headers();
-  // read the custom x-url header to get tripId
-  const header_url = headersList.get('x-url') || '';
-  const tripId = header_url.split('/').at(-1);
+  try {
+    const headersList = headers();
+    // read the custom x-url header to get tripId
+    const header_url = headersList.get('x-url') || '';
+    const tripId = header_url.split('/').at(-1);
+    // check if trip is created by logged in user
+    await connectToDatabase();
+    const trip = await Trip.findById(tripId);
+    const session = await auth();
+    if (!trip.createdBy === session.user.id) return;
 
-  // console.log('data in actions', data);
+    const filteredData = filterData(
+      data,
+      'name',
+      'address',
+      'description',
+      'coordinates',
+      'isHike',
+      'images',
+    );
+    const newLocation = await Location.create(filteredData);
+    const modTrip = await Trip.findByIdAndUpdate(
+      tripId,
+      { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
+      { new: true },
+    );
 
-  // check if trip is created by logged in user
-  await connectToDatabase();
-  const trip = await Trip.findById(tripId);
-  const session = await auth();
-  if (!trip.createdBy === session.user.id) return;
-
-  // const rawData = Object.fromEntries(data.entries());
-  // rawData.coordinates = rawData.coordinates.split(',');
-  // rawData.images = [rawData.imageUrl];
-  const filteredData = filterData(
-    data,
-    'name',
-    'address',
-    'description',
-    'coordinates',
-    'isHike',
-    'images',
-  );
-  const newLocation = await Location.create(filteredData);
-
-  const modTrip = await Trip.findByIdAndUpdate(
-    tripId,
-    { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
-    { new: true },
-  );
-  console.log(modTrip);
+    return JSON.parse(JSON.stringify(newLocation));
+  } catch (err) {
+    console.error(err);
+    throw new Error(`Couldn't create new location. ${err.message}`);
+  }
 }
 
 function filterData(obj, ...allowedFields) {

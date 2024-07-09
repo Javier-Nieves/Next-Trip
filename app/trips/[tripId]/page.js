@@ -38,6 +38,7 @@ export default function Page({ params }) {
   useEffect(
     function () {
       async function displayMap() {
+        // console.log('\x1b[36m%s\x1b[0m', '0');
         if (mapIsLoading) return;
         // get trip info
         const res = await fetch(`/api/trips/${params.tripId}`);
@@ -62,10 +63,11 @@ export default function Page({ params }) {
     [isEditingSession],
   );
 
-  // 0.5) convert map to editing if needed
+  // 1) convert map to editing if needed
   useEffect(
     function () {
       async function convertToEditing() {
+        // console.log('\x1b[36m%s\x1b[0m', '1');
         if (!map.current) return;
         function handleClick(event) {
           // remove previous marker
@@ -92,30 +94,47 @@ export default function Page({ params }) {
       }
       convertToEditing();
     },
-    [isEditingSession, waypoints, isHike],
+    [isEditingSession, isHike],
   );
 
-  // 1
+  // 2)
   useEffect(() => {
     if (locations.length > 0) {
+      // console.log('\x1b[36m%s\x1b[0m', '2 arrays');
       // locations and routes are created on the map via new layers
       // layers use Sourses, which are filled from arrays:
-      fillGeoArrays(locations);
+      const bounds = new mapboxgl.LngLatBounds();
+      fillGeoArrays(locations, bounds);
+      // adding padding to the map
+      !isEditingSession &&
+        map.current?.fitBounds(bounds, {
+          padding: {
+            top: 120,
+            bottom: 120,
+            left: 120,
+            right: 120,
+          },
+          duration: 3000,
+        });
     }
   }, [locations]);
-  // 2
+
+  // 3)
   useEffect(() => {
-    if (features.length > 0 || !mapIsLoading) {
+    // console.log('\x1b[36m%s\x1b[0m', '3 layer');
+    if (features.length > 0) {
       createLocationsLayer();
       populatePopups();
     }
   }, [features, mapIsLoading]);
 
-  // 3 getting GeoJSON data for location points
+  // 4) getting GeoJSON data for location points
   useEffect(
     function () {
       async function plotPath() {
-        // if (!map.current) return;
+        // console.log('\x1b[36m%s\x1b[0m', '4');
+        // remove marker from map
+        document.querySelector('.mapboxgl-marker')?.remove();
         if (!waypoints.length) return;
         const routeData = await createGeoJSON(waypoints, isHike);
 
@@ -132,8 +151,7 @@ export default function Page({ params }) {
     [waypoints, isHike],
   );
 
-  function fillGeoArrays(locations) {
-    const bounds = new mapboxgl.LngLatBounds();
+  function fillGeoArrays(locations, bounds) {
     // create an array for future map.addSource method
     // and waypoints array for Routes drawing
     let newWaypoints = [];
@@ -149,39 +167,30 @@ export default function Page({ params }) {
       });
       newFeatures.push(newFeature);
       newWaypoints.push(loc.coordinates);
-      // showing all locations + adding padding to the map
+      // extend map's bounds to include location
       bounds.extend(loc.coordinates);
-      map.current?.fitBounds(bounds, {
-        padding: {
-          top: 120,
-          bottom: 120,
-          left: 120,
-          right: 120,
-        },
-        duration: 3000,
-      });
     });
     setWaypoints(() => [...newWaypoints]);
     setFeatures(() => [...newFeatures]);
   }
 
   function createLocationsLayer() {
+    // updating layer's source if new feature is added
+    if (map.current?.getSource('locations'))
+      map.current.getSource('locations').setData({
+        type: 'FeatureCollection',
+        features,
+      });
+
     map.current?.on('load', () => {
-      // creating or updating layer's source
-      if (!map.current.getSource('locations')) {
-        map.current.addSource('locations', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features,
-          },
-        });
-      } else {
-        map.current.getSource('locations').setData({
+      // creating source for the Locations layer
+      map.current.addSource('locations', {
+        type: 'geojson',
+        data: {
           type: 'FeatureCollection',
           features,
-        });
-      }
+        },
+      });
       // creating Locations layer
       if (!map.current.getLayer('locations')) {
         map.current.addLayer({
@@ -278,6 +287,7 @@ export default function Page({ params }) {
             setNewLocationCoordinates={setNewLocationCoordinates}
             coordinates={newLocationCoordinates}
             isHike={isHike}
+            setLocations={setLocations}
           />
         )}
 

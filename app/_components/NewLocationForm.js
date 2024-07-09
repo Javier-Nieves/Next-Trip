@@ -3,26 +3,37 @@ import { useForm } from 'react-hook-form';
 import { MultiImageDropzoneUsage } from './MultiImageDropzoneUsage';
 import { createLocation } from '@/app/_lib/actions';
 
-function NewLocationForm({ isHike, setNewLocationCoordinates, coordinates }) {
-  const { register, handleSubmit, setValue } = useForm();
+function NewLocationForm({
+  isHike,
+  setNewLocationCoordinates,
+  coordinates,
+  setLocations,
+}) {
+  const { register, handleSubmit } = useForm();
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  //   console.log('\x1b[36m%s\x1b[0m', 'images', uploadedImages);
 
-  function onSubmit(data) {
-    // adding controlled field 'images' into the form data
-    // setValue('images', uploadedImages);
-    const { name, address, description } = data;
-    const fullData = {
-      coordinates,
-      name,
-      address,
-      description,
-      images: uploadedImages,
-      isHike,
-    };
-    console.log('updated data:', fullData);
-    createLocation(fullData);
+  async function onSubmit(data) {
+    try {
+      // adding controlled field 'images' into the form data
+      // setValue('images', uploadedImages);
+      const { name, address, description } = data;
+      const fullData = {
+        coordinates,
+        name,
+        address,
+        description,
+        images: uploadedImages,
+        isHike,
+      };
+      // console.log('updated data:', fullData);
+      const newLocation = await createLocation(fullData);
+      console.log('\x1b[34m%s\x1b[0m', 'success', newLocation);
+      setLocations((cur) => [...cur, newLocation]);
+      setNewLocationCoordinates([]);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (

@@ -60,7 +60,8 @@ export async function createGeoJSON(waypoints, isHike) {
   // 'hike' === less than 100km btw points
   let wayPointsString = '';
   waypoints.forEach((place) => {
-    wayPointsString += `lonlat:${place.join(',')}|`;
+    // console.log('\x1b[36m%s\x1b[0m', 'waypoint', place);
+    place && (wayPointsString += `lonlat:${place.join(',')}|`);
   });
   wayPointsString = wayPointsString.slice(0, -1);
 
