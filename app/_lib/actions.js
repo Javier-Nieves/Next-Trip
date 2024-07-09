@@ -34,11 +34,11 @@ export async function createTrip(data) {
 
 export async function createLocation(data) {
   const headersList = headers();
-  // read the custom x-url header
+  // read the custom x-url header to get tripId
   const header_url = headersList.get('x-url') || '';
   const tripId = header_url.split('/').at(-1);
 
-  // console.log('data:::', data);
+  // console.log('data in actions', data);
 
   // check if trip is created by logged in user
   await connectToDatabase();
@@ -46,12 +46,11 @@ export async function createLocation(data) {
   const session = await auth();
   if (!trip.createdBy === session.user.id) return;
 
-  // todo - add images!
-  const rawData = Object.fromEntries(data.entries());
-  rawData.coordinates = rawData.coordinates.split(',');
-  rawData.images = [rawData.imageUrl];
+  // const rawData = Object.fromEntries(data.entries());
+  // rawData.coordinates = rawData.coordinates.split(',');
+  // rawData.images = [rawData.imageUrl];
   const filteredData = filterData(
-    rawData,
+    data,
     'name',
     'address',
     'description',
@@ -66,7 +65,7 @@ export async function createLocation(data) {
     { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
     { new: true },
   );
-  // console.log(modTrip);
+  console.log(modTrip);
 }
 
 function filterData(obj, ...allowedFields) {

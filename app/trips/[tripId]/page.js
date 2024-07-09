@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { format } from 'date-fns';
 import mapboxgl from '!mapbox-gl';
 import { centeredMap, createFeature, createGeoJSON } from '@/app/_lib/mapbox';
-import { useEdgeStore } from '@/app/_lib/edgestore';
 import Spinner from '@/app/_components/Spinner';
 import TripDescription from '@/app/_components/TripDescription';
 import LocationInfo from '@/app/_components/LocationInfo';
@@ -17,12 +16,11 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function Page({ params }) {
   // todo - useReducer
-  const { edgestore } = useEdgeStore();
   const [mapIsLoading, setMapIsLoading] = useState(false);
   const [trip, setTrip] = useState({});
   const [isEditingSession, setIsEditingSession] = useState(false);
   const [regenerateMap, setRegenerateMap] = useState(false);
-  const [creatingLocation, setCreatingLocation] = useState(false);
+  const [newLocationCoordinates, setNewLocationCoordinates] = useState([]);
   const [locationInfo, setLocationInfo] = useState(null);
   const [isHike, setIsHike] = useState(false);
 
@@ -72,7 +70,6 @@ export default function Page({ params }) {
         function handleClick(event) {
           // remove previous marker
           document.querySelector('.mapboxgl-marker')?.remove();
-
           // add marker to the click coordinates
           const coordinates = event.lngLat;
           const marker = new mapboxgl.Marker()
@@ -85,34 +82,7 @@ export default function Page({ params }) {
             padding: { left: window.innerWidth * 0.5 },
             duration: 1000,
           });
-          setCreatingLocation(true);
-
-          // add handler to the popup form:
-          //   document
-          //     .querySelector('.newLocation__popup-form')
-          //     .addEventListener('submit', async (e) => {
-          //       e.preventDefault();
-          //       const coordArray = [popup._lngLat.lng, popup._lngLat.lat];
-          //       const form = createFormData(coordArray, isHike);
-          //       popup.remove();
-          //       // upload images, create Location document in the DB:
-          //       locationPopupHandler(form, edgestore);
-          //       // update map on screen
-          //       createFeature({
-          //         name: form.get('name'),
-          //         address: form.get('address'),
-          //         description: form.get('description'),
-          //         coordinates: coordArray,
-          //         images: form.get('images'),
-          //       });
-          //       createLocationsLayer();
-          //       setWaypoints((cur) => [...cur, coordArray]);
-          //       // plot route if there are more then 2 locations in a trip
-          //       if (waypoints.length > 1) {
-          //         const geoData = await createGeoJSON(waypoints, isHike);
-          //         drawRoute(geoData);
-          //       }
-          //     });
+          setNewLocationCoordinates([+coordinates.lng, +coordinates.lat]);
         }
         if (isEditingSession) {
           // If editing - add form to create locations
@@ -303,8 +273,12 @@ export default function Page({ params }) {
           <TripDescription highlight={highlight} description={description} />
         )}
         {/* add location form */}
-        {isEditingSession && creatingLocation && (
-          <NewLocationForm setCreatingLocation={setCreatingLocation} />
+        {isEditingSession && Boolean(newLocationCoordinates.length) && (
+          <NewLocationForm
+            setNewLocationCoordinates={setNewLocationCoordinates}
+            coordinates={newLocationCoordinates}
+            isHike={isHike}
+          />
         )}
 
         <div className="absolute z-50 right-5 md:right-[20px] lg:right-[100px] top-6 flex flex-col     gap-2 items-end">

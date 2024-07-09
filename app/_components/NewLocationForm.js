@@ -1,11 +1,38 @@
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { MultiImageDropzoneUsage } from './MultiImageDropzoneUsage';
+import { createLocation } from '@/app/_lib/actions';
 
-function NewLocationForm({ setCreatingLocation }) {
+function NewLocationForm({ isHike, setNewLocationCoordinates, coordinates }) {
+  const { register, handleSubmit, setValue } = useForm();
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  //   console.log('\x1b[36m%s\x1b[0m', 'images', uploadedImages);
+
+  function onSubmit(data) {
+    // adding controlled field 'images' into the form data
+    // setValue('images', uploadedImages);
+    const { name, address, description } = data;
+    const fullData = {
+      coordinates,
+      name,
+      address,
+      description,
+      images: uploadedImages,
+      isHike,
+    };
+    console.log('updated data:', fullData);
+    createLocation(fullData);
+  }
+
   return (
-    <div className="absolute z-50 w-[450px] h-3/4 left-10 bg-[var(--color-light-yellow)] rounded-lg translate-y-[100px]">
-      <div className="flex flex-col items-center justify-center gap-4 p-4">
+    <div className="absolute z-50 w-[450px] mx-10 flex items-center justify-center min-h-screen">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col items-center justify-center gap-4 p-4 bg-[var(--color-light-yellow)] rounded-lg relative"
+      >
         <button
-          onClick={() => setLocationInfo(null)}
+          onClick={() => setNewLocationCoordinates([])}
           className="absolute top-3 right-3"
         >
           &#10005;
@@ -15,28 +42,47 @@ function NewLocationForm({ setCreatingLocation }) {
 
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Name: </span>
-          <input type="text" required className="p-2 rounded-md" />
+          <input
+            type="text"
+            className="p-2 rounded-md"
+            required
+            {...register('name', { required: 'This field is required' })}
+          />
         </div>
 
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Address: </span>
-          <input type="text" className="p-2 rounded-md text-md" />
+          <input
+            type="text"
+            className="p-2 rounded-md text-md"
+            {...register('address')}
+          />
         </div>
 
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Description: </span>
-          <textarea type="text" className="h-24 p-2 rounded-md text-md" />
+          <textarea
+            type="text"
+            className="h-24 p-2 rounded-md text-md"
+            {...register('description')}
+          />
         </div>
 
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Images: </span>
-          <MultiImageDropzoneUsage />
+          <MultiImageDropzoneUsage
+            setUploadedImages={setUploadedImages}
+            setIsLoading={setIsLoading}
+          />
         </div>
 
-        <button className="bg-[var(--color-accent-base)] hover:bg-[var(--color-accent-dark)] p-2 mt-2 rounded-md text-lg">
-          Create
+        <button
+          disabled={isLoading}
+          className={`${isLoading ? 'bg-stone-500' : 'bg-[var(--color-accent-base)]'} ${!isLoading ? 'hover:bg-[var(--color-accent-dark)]' : ''} p-2 mt-2 rounded-md text-lg`}
+        >
+          {isLoading ? 'Loading...' : 'Create'}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
