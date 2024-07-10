@@ -21,15 +21,18 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`flex relative flex-col min-h-screen antialiased ${raleway.className}`}
+        className={`flex relative flex-col min-h-screen w-screen antialiased ${raleway.className}`}
       >
-        <Image
-          src={back}
-          placeholder="blur"
-          quality={50}
-          className="absolute top-0 -z-[100]"
-          alt="Background image"
-        />
+        <div className="fixed top-0 left-0 inset-0 -z-[100]">
+          <Image
+            src={back}
+            placeholder="blur"
+            quality={70}
+            fill
+            className="bg-fixed pointer-events-none select-none"
+            alt="Background image"
+          />
+        </div>
 
         <Header>
           <Logo />

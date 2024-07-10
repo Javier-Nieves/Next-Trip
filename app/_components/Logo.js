@@ -12,7 +12,7 @@ function Logo() {
         quality={80}
         alt="See the world logo"
       />
-      <span className="z-10 hidden text-4xl font-extrabold md:block">
+      <span className="z-10 text-2xl min-[400px]:text-3xl font-extrabold">
         See the World
       </span>
     </Link>

@@ -17,15 +17,12 @@ export async function centeredMap(mapContainer, locations) {
     center,
     zoom: 9,
   });
-
   // adding scale control
   map.addControl(new mapboxgl.ScaleControl());
   // adding zoom buttons
   const zoomPanel = new mapboxgl.NavigationControl({ showCompass: false });
   map.addControl(zoomPanel, 'bottom-left');
   // change cursor
-  // if (isEditingSession) map.getCanvas().style.cursor = 'crosshair';
-  // else map.getCanvas().style.cursor = 'pointer';
   map.getCanvas().style.cursor = 'pointer';
 
   return map;
@@ -38,8 +35,6 @@ export const createFeature = (loc) => {
       description: `
         <div class='location-description'>
           <h3>${loc.name}</h3>
-          <h4>${loc.address}</h4>
-          <h5>${loc.description}</h5>
         </div>
         `,
       name: loc.name,
@@ -60,7 +55,6 @@ export async function createGeoJSON(waypoints, isHike) {
   // 'hike' === less than 100km btw points
   let wayPointsString = '';
   waypoints.forEach((place) => {
-    // console.log('\x1b[36m%s\x1b[0m', 'waypoint', place);
     place && (wayPointsString += `lonlat:${place.join(',')}|`);
   });
   wayPointsString = wayPointsString.slice(0, -1);
@@ -74,34 +68,6 @@ export async function createGeoJSON(waypoints, isHike) {
   const routeData = await res.json();
   return routeData;
 }
-
-// export async function locationPopupHandler(form, edgestore) {
-//   if (form.has('images')) {
-//     const file = form.get('images');
-//     // uploading picture to EdgeStore
-//     // todo - upload multiple files. Limit size to 2 Mb
-//     const res = await edgestore.publicFiles.upload({
-//       file,
-//       // onProgressChange: (progress) => setProgress(progress),
-//     });
-//     form.append('imageUrl', res.url);
-//   }
-//   createLocation(form);
-// }
-
-// export const createFormData = (coordArray, isHike = false) => {
-//   const form = new FormData();
-//   form.append('name', document.querySelector('.newLocation__popup-name').value);
-//   // prettier-ignore
-//   form.append('address', document.querySelector('.newLocation__popup-address').value);
-//   // prettier-ignore
-//   form.append('description', document.querySelector('.newLocation__popup-desc').value);
-//   form.append('coordinates', coordArray);
-//   form.append('isHike', isHike);
-//   const images = document.querySelector('#images').files;
-//   for (let i = 0; i < images.length; i++) form.append('images', images[i]);
-//   return form;
-// };
 
 function handleGetLocation() {
   return new Promise((resolve, reject) => {

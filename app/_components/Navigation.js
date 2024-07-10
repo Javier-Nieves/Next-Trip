@@ -16,7 +16,7 @@ export default async function Navigation() {
   return (
     <nav className="text-2xl font-light">
       <ul className="flex items-center gap-16">
-        <li>
+        <li className="hidden min-[630px]:block">
           <Link
             href="/search"
             className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"

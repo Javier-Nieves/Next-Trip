@@ -8,7 +8,11 @@ import {
 import { useState } from 'react';
 import { useEdgeStore } from '../_lib/edgestore';
 
-export function MultiImageDropzoneUsage({ setUploadedImages, setIsLoading }) {
+export function MultiImageDropzoneUsage({
+  setUploadedImages,
+  setIsLoading,
+  maxFiles,
+}) {
   const [fileStates, setFileStates] = useState<FileState[]>([]);
   const { edgestore } = useEdgeStore();
 
@@ -31,7 +35,7 @@ export function MultiImageDropzoneUsage({ setUploadedImages, setIsLoading }) {
         value={fileStates}
         dropzoneOptions={{
           maxSize: 2097152,
-          maxFiles: 6,
+          maxFiles,
         }}
         onChange={(files) => {
           setFileStates(files);

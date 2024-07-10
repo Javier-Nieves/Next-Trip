@@ -5,7 +5,8 @@ import { getUserInfo } from '../_lib/data-service';
 import PhotoLink from './PhotoLink';
 
 async function TripCard({ trip, cardNumber }) {
-  const { user, isFriend, isMe } = await getUserInfo(trip.createdBy);
+  const { isFriend, isMe } = await getUserInfo(trip.createdBy);
+  const { user } = await getUserInfo(trip.travelers?.at(0));
 
   const isBigCard = cardNumber < 3;
 

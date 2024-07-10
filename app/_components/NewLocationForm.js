@@ -28,7 +28,7 @@ function NewLocationForm({
       };
       // console.log('updated data:', fullData);
       const newLocation = await createLocation(fullData);
-      console.log('\x1b[34m%s\x1b[0m', 'success', newLocation);
+      // console.log('\x1b[34m%s\x1b[0m', 'success', newLocation);
       setLocations((cur) => [...cur, newLocation]);
       setNewLocationCoordinates([]);
     } catch (err) {
@@ -82,6 +82,7 @@ function NewLocationForm({
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Images: </span>
           <MultiImageDropzoneUsage
+            maxFiles={6}
             setUploadedImages={setUploadedImages}
             setIsLoading={setIsLoading}
           />

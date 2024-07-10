@@ -7,27 +7,28 @@ import { differenceInDays } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
-import { useEdgeStore } from '../_lib/edgestore';
 import { createTrip } from '../_lib/actions';
 import Button from '../_components/Button';
-import Progress from '../_components/Progress';
 import TravelersList from '../_components/TravelersList';
+import { MultiImageDropzoneUsage } from '../_components/MultiImageDropzoneUsage';
 
 export default function Page() {
+  // todo - useReducer
   const initialRange = { from: undefined, to: undefined };
   const [range, setRange] = useState(initialRange);
   const [inputValue, setInputValue] = useState('');
-  const [file, setFile] = useState(null);
-  const [progress, setProgress] = useState(0);
+  const [selectedTravelers, setSelectedTravelers] = useState([]);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isWideScreen, setIsWideScreen] = useState(false);
+
   const userId = useRef(null);
   const travelers = useRef([]);
-  const [selectedTravelers, setSelectedTravelers] = useState([]);
-  const { edgestore } = useEdgeStore();
   const { register, handleSubmit, reset, formState } = useForm({
     defaultValues: {},
   });
   //   const { errors } = formState;
-  const duration = +differenceInDays(range.to, range.from) + 1;
+  const duration = +differenceInDays(range?.to, range?.from) + 1;
 
   // getting friends info to populate travelers selector and add userId to Trip object
   useEffect(function () {
@@ -42,17 +43,16 @@ export default function Page() {
     getFriends();
   }, []);
 
-  async function onSubmit(data) {
-    let coverImage = '/public/default-trip.jpeg';
-    if (data.coverImage.length) {
-      // uploading coverImage to EdgeStore
-      const res = await edgestore.publicFiles.upload({
-        file,
-        onProgressChange: (progress) => setProgress(progress),
-      });
-      coverImage = res.url;
-    }
+  // check phone or web
+  useEffect(
+    function () {
+      setIsWideScreen(window.screen.width > 660);
+    },
+    [isWideScreen],
+  );
 
+  async function onSubmit(data) {
+    let coverImage = uploadedImages.at(0) || '/public/default-trip.jpeg';
     const completeData = {
       ...data,
       createdBy: userId.current,
@@ -97,18 +97,17 @@ export default function Page() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center justify-center w-1/2 mx-auto my-3"
+      className="flex flex-col items-center justify-center w-full mx-auto my-3 md:w-1/2"
     >
       <h1>Create trip</h1>
-      <Progress progress={progress} />
-      <div className="flex">
+      <div className="flex items-center">
         <div className="w-3/4">
           <input
             className="px-5 py-3 w-[90%] shadow-md rounded-xl m-3"
             type="text"
             placeholder="Name"
             id="name"
-            // disabled={isWorking}
+            disabled={isLoading}
             {...register('name', { required: 'This field is required' })}
           />
 
@@ -117,43 +116,55 @@ export default function Page() {
             type="text"
             placeholder="Best thing about this trip"
             id="highlight"
-            // disabled={isWorking}
+            disabled={isLoading}
             {...register('highlight')}
           />
         </div>
-        <div className="flex items-center justify-center w-1/4">
-          <label className="flex flex-col items-center gap-4 cursor-pointer justity-center">
-            <span className="text-sm font-medium text-gray-900 ms-3 dark:text-gray-300">
-              Friends only
-            </span>
-            <div>
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                {...register('private')}
-              />
-              <div className="relative w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-            </div>
-          </label>
+        <div className="w-1/4 pr-1 md:p-2">
+          <MultiImageDropzoneUsage
+            setUploadedImages={setUploadedImages}
+            setIsLoading={setIsLoading}
+            maxFiles={1}
+          />
         </div>
       </div>
 
-      <div className="flex flex-col items-center w-full">
-        <div className="flex items-center justify-center w-full">
-          <label htmlFor="traveler-input">Travelers:</label>
-          <input
-            className="px-5 py-3 m-3 shadow-md rounded-xl"
-            id="traveler-input"
-            list="travelers-list"
-            value={inputValue}
-            onChange={handleInputChange}
-          />
+      <div className="flex flex-col items-center w-full m-3">
+        <div className="flex justify-around w-full">
+          <div>
+            <div className="flex items-center justify-center w-full">
+              <label htmlFor="traveler-input">Travelers:</label>
+              <input
+                className="px-5 py-3 m-3 shadow-md rounded-xl"
+                id="traveler-input"
+                list="travelers-list"
+                value={inputValue}
+                onChange={handleInputChange}
+              />
+            </div>
+            <datalist id="travelers-list">
+              {travelers.current.map((friend) => (
+                <option key={friend._id} value={friend.name} />
+              ))}
+            </datalist>
+          </div>
+
+          <div className="flex items-center justify-center w-1/4">
+            <label className="flex flex-col items-center gap-4 cursor-pointer sm:flex-row justity-center">
+              <span className="text-sm font-medium text-center text-gray-900 dark:text-gray-300">
+                Friends only:
+              </span>
+              <div>
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  {...register('private')}
+                />
+                <div className="relative w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+              </div>
+            </label>
+          </div>
         </div>
-        <datalist id="travelers-list">
-          {travelers.current.map((friend) => (
-            <option key={friend.id} value={friend.name} />
-          ))}
-        </datalist>
 
         <div>
           <TravelersList
@@ -173,21 +184,9 @@ export default function Page() {
         fromDate={new Date()}
         toYear={new Date().getFullYear() + 5}
         captionLayout="dropdown"
-        numberOfMonths={2}
+        numberOfMonths={isWideScreen ? 2 : 1}
       />
-
-      <div>
-        <span>Cover image: </span>
-        <input
-          className="my-3"
-          type="file"
-          {...register('coverImage')}
-          onChange={(e) => {
-            setFile(e.target.files?.[0]);
-          }}
-        />
-      </div>
-      <Button className="border-1">Create trip</Button>
+      <Button disabled={isLoading}>Create trip</Button>
     </form>
   );
 }

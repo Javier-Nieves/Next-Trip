@@ -1,3 +1,5 @@
+import { format } from 'date-fns';
+
 function TripTitle({ trip }) {
   const { date, duration, name } = trip;
   const formattedDate = date ? format(date, 'dd.MM.yyyy') : '';

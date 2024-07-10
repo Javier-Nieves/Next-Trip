@@ -184,13 +184,19 @@ export default function Page({ params }) {
 
     map.current?.on('load', () => {
       // creating source for the Locations layer
-      map.current.addSource('locations', {
-        type: 'geojson',
-        data: {
+      if (map.current?.getSource('locations'))
+        map.current.getSource('locations').setData({
           type: 'FeatureCollection',
           features,
-        },
-      });
+        });
+      else
+        map.current.addSource('locations', {
+          type: 'geojson',
+          data: {
+            type: 'FeatureCollection',
+            features,
+          },
+        });
       // creating Locations layer
       if (!map.current.getLayer('locations')) {
         map.current.addLayer({

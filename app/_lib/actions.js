@@ -29,7 +29,7 @@ export async function createTrip(data) {
   const newTrip = await Trip.create(filteredBody);
   // console.log(newTrip);
   revalidatePath(`/`);
-  redirect('/');
+  redirect(`/trips/${newTrip._id}`);
 }
 
 export async function createLocation(data) {
