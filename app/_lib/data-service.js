@@ -94,7 +94,7 @@ export async function getTripInfo(tripId) {
     await connectToDatabase();
     const session = await auth();
     const trip = await Trip.findById(tripId);
-    return { trip, isMyTrip: session.user.id === trip.createdBy };
+    return { trip, isMyTrip: session?.user?.id === trip.createdBy };
   } catch (err) {
     console.error(err.message);
   }

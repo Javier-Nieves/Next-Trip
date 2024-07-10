@@ -8,9 +8,10 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 
 import { createTrip } from '../_lib/actions';
+import { MultiImageDropzoneUsage } from '../_components/MultiImageDropzoneUsage';
+import SmallToggle from '../_components/SmallToggle';
 import Button from '../_components/Button';
 import TravelersList from '../_components/TravelersList';
-import { MultiImageDropzoneUsage } from '../_components/MultiImageDropzoneUsage';
 
 export default function Page() {
   // todo - useReducer
@@ -97,13 +98,13 @@ export default function Page() {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="flex flex-col items-center justify-center w-full mx-auto my-3 md:w-1/2"
+      className="flex flex-col items-center justify-center w-full mx-auto md:w-1/2"
     >
-      <h1>Create trip</h1>
+      <h1 className="p-1 text-4xl">Create trip</h1>
       <div className="flex items-center">
         <div className="w-3/4">
           <input
-            className="px-5 py-3 w-[90%] shadow-md rounded-xl m-3"
+            className="px-5 py-3 w-[90%] shadow-md rounded-xl m-2"
             type="text"
             placeholder="Name"
             id="name"
@@ -112,7 +113,7 @@ export default function Page() {
           />
 
           <input
-            className="px-5 py-3 w-[90%] shadow-md rounded-xl m-3"
+            className="px-5 py-3 w-[90%] shadow-md rounded-xl m-2"
             type="text"
             placeholder="Best thing about this trip"
             id="highlight"
@@ -129,13 +130,13 @@ export default function Page() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center w-full m-3">
+      <div className="flex flex-col items-center w-full">
         <div className="flex justify-around w-full">
           <div>
             <div className="flex items-center justify-center w-full">
               <label htmlFor="traveler-input">Travelers:</label>
               <input
-                className="px-5 py-3 m-3 shadow-md rounded-xl"
+                className="px-5 py-3 m-2 shadow-md rounded-xl"
                 id="traveler-input"
                 list="travelers-list"
                 value={inputValue}
@@ -149,21 +150,7 @@ export default function Page() {
             </datalist>
           </div>
 
-          <div className="flex items-center justify-center w-1/4">
-            <label className="flex flex-col items-center gap-4 cursor-pointer sm:flex-row justity-center">
-              <span className="text-sm font-medium text-center text-gray-900 dark:text-gray-300">
-                Friends only:
-              </span>
-              <div>
-                <input
-                  type="checkbox"
-                  className="sr-only peer"
-                  {...register('private')}
-                />
-                <div className="relative w-11 h-6 bg-gray-400 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-              </div>
-            </label>
-          </div>
+          <SmallToggle register={register}>Friends only:</SmallToggle>
         </div>
 
         <div>
@@ -175,7 +162,7 @@ export default function Page() {
       </div>
 
       <DayPicker
-        className="pt-3 place-self-center"
+        className="place-self-center"
         mode="range"
         locale={enGB}
         onSelect={setRange}
@@ -186,7 +173,7 @@ export default function Page() {
         captionLayout="dropdown"
         numberOfMonths={isWideScreen ? 2 : 1}
       />
-      <Button disabled={isLoading}>Create trip</Button>
+      <Button disabled={isLoading}>Save</Button>
     </form>
   );
 }

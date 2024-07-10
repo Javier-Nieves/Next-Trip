@@ -1,6 +1,5 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { format } from 'date-fns';
 import mapboxgl from '!mapbox-gl';
 import { centeredMap, createFeature, createGeoJSON } from '@/app/_lib/mapbox';
 import Spinner from '@/app/_components/Spinner';
@@ -33,13 +32,16 @@ export default function Page({ params }) {
   const mapContainer = useRef(null);
   const map = useRef(null);
   const isMyTrip = useRef(null);
+  const debounceTimeoutRef = useRef(null);
 
   // 0) get trip info & display map
   useEffect(
     function () {
-      async function displayMap() {
-        // console.log('\x1b[36m%s\x1b[0m', '0');
-        if (mapIsLoading) return;
+      // clear any existing timeout to debounce the effect
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+      debounceTimeoutRef.current = setTimeout(async () => {
         // get trip info
         const res = await fetch(`/api/trips/${params.tripId}`);
         const data = await res.json();
@@ -48,7 +50,6 @@ export default function Page({ params }) {
         isMyTrip.current = data.data.isMyTrip;
         setLocations(data.data.trip.locations);
         // map container should be empty to render a new map (with editing)
-        if (map.current && !regenerateMap) return;
         if (regenerateMap) {
           // when editing session if over => regenerate map without click handler
           mapContainer.current.innerHTML = '';
@@ -57,8 +58,15 @@ export default function Page({ params }) {
         setMapIsLoading(() => true);
         map.current = await centeredMap(mapContainer.current, locations);
         setMapIsLoading(() => false);
-      }
-      displayMap();
+
+        // clear the timeout after execution
+        debounceTimeoutRef.current = null;
+      }, 100);
+      return () => {
+        if (debounceTimeoutRef.current) {
+          clearTimeout(debounceTimeoutRef.current);
+        }
+      };
     },
     [isEditingSession],
   );
@@ -94,7 +102,7 @@ export default function Page({ params }) {
       }
       convertToEditing();
     },
-    [isEditingSession, isHike],
+    [isEditingSession, isHike, map.current],
   );
 
   // 2)
@@ -106,18 +114,17 @@ export default function Page({ params }) {
       const bounds = new mapboxgl.LngLatBounds();
       fillGeoArrays(locations, bounds);
       // adding padding to the map
-      !isEditingSession &&
-        map.current?.fitBounds(bounds, {
-          padding: {
-            top: 120,
-            bottom: 120,
-            left: 120,
-            right: 120,
-          },
-          duration: 3000,
-        });
+      map.current?.fitBounds(bounds, {
+        padding: {
+          top: 120,
+          bottom: 120,
+          left: 120,
+          right: 120,
+        },
+        duration: 3000,
+      });
     }
-  }, [locations]);
+  }, [locations, isEditingSession, map.current]);
 
   // 3)
   useEffect(() => {
@@ -148,7 +155,7 @@ export default function Page({ params }) {
       }
       plotPath();
     },
-    [waypoints, isHike],
+    [waypoints, isHike, map.current],
   );
 
   function fillGeoArrays(locations, bounds) {
@@ -297,7 +304,7 @@ export default function Page({ params }) {
           />
         )}
 
-        <div className="absolute z-50 right-5 md:right-[20px] lg:right-[100px] top-6 flex flex-col     gap-2 items-end">
+        <div className="absolute z-50 left-9 top-[100px] flex flex-col gap-2 items-start">
           <TripTitle trip={trip} />
 
           {travelers?.length && (

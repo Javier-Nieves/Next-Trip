@@ -1,17 +1,10 @@
 import Link from 'next/link';
 import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
-import { headers } from 'next/headers';
 
 export default async function Navigation() {
   const session = await auth();
   const user = session?.user;
-
-  // const headersList = headers();
-  // // read the custom x-url header (from middleware)
-  // const header_url = headersList.get('x-url') || '';
-  // const isTripPage = header_url.includes('/trips');
-  // console.log('\x1b[36m%s\x1b[0m', 'isTripPage', isTripPage);
 
   return (
     <nav className="text-2xl font-light">
@@ -72,7 +65,7 @@ export default async function Navigation() {
           ) : (
             <Link
               href="/login"
-              className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
+              className="z-50 transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
             >
               Login
             </Link>

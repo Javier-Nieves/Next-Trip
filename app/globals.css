@@ -42,10 +42,6 @@ body {
   }
 }
 
-h1 {
-  font-size: 2.5rem;
-}
-
 .loader {
   margin: 3.2rem auto 1.6rem;
   width: 100px;
