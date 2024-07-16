@@ -1,17 +1,18 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { MultiImageDropzoneUsage } from './MultiImageDropzoneUsage';
-import { createLocation } from '@/app/_lib/actions';
+import { useEditTrip } from '@/app/trips/[tripId]/useEditTrip';
 
 function NewLocationForm({
   isHike,
   setNewLocationCoordinates,
   coordinates,
-  setLocations,
+  setTripToShow,
 }) {
   const { register, handleSubmit } = useForm();
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { isEditing, editTrip } = useEditTrip();
 
   async function onSubmit(data) {
     try {
@@ -27,9 +28,10 @@ function NewLocationForm({
         isHike,
       };
       // console.log('updated data:', fullData);
-      const newLocation = await createLocation(fullData);
+      // todo! make if a mutation with query invalidation
+      editTrip(fullData);
+      // const modifiedTrip = await addLocationToTrip(fullData);
       // console.log('\x1b[34m%s\x1b[0m', 'success', newLocation);
-      setLocations((cur) => [...cur, newLocation]);
       setNewLocationCoordinates([]);
     } catch (err) {
       console.error(err);

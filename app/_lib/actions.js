@@ -32,7 +32,7 @@ export async function createTrip(data) {
   redirect(`/trips/${newTrip._id}`);
 }
 
-export async function createLocation(data) {
+export async function addLocationToTrip(data) {
   try {
     const headersList = headers();
     // read the custom x-url header to get tripId
@@ -60,7 +60,7 @@ export async function createLocation(data) {
       { new: true },
     );
 
-    return JSON.parse(JSON.stringify(newLocation));
+    return JSON.parse(JSON.stringify(modTrip));
   } catch (err) {
     console.error(err);
     throw new Error(`Couldn't create new location. ${err.message}`);

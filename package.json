@@ -12,6 +12,8 @@
     "@edgestore/react": "^0.1.7",
     "@edgestore/server": "^0.1.7",
     "@heroicons/react": "^2.1.4",
+    "@tanstack/react-query": "^5.51.1",
+    "@tanstack/react-query-devtools": "^5.51.1",
     "bcryptjs": "^2.4.3",
     "date-fns": "^3.6.0",
     "lucide-react": "^0.403.0",

@@ -1,6 +1,6 @@
 import { Raleway } from 'next/font/google';
 import Image from 'next/image';
-import { EdgeStoreProvider } from './_lib/edgestore';
+import Providers from '@/app/_components/Providers';
 import Header from './_components/Header';
 import Logo from './_components/Logo';
 import back from '@/public/back.jpg';
@@ -38,7 +38,7 @@ export default function RootLayout({ children }) {
           <Logo />
         </Header>
 
-        <EdgeStoreProvider>{children}</EdgeStoreProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

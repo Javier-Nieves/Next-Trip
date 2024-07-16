@@ -45,9 +45,9 @@ export default async function Navigation() {
             </li>
           </>
         )}
-        <li>
+        <li className="z-50">
           {session?.user?.image ? (
-            <div className="z-50 flex gap-3">
+            <div className="flex gap-3">
               <Link
                 href="/account"
                 className="flex items-center transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"

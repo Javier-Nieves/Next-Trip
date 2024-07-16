@@ -1,6 +1,8 @@
 import { format } from 'date-fns';
 
-function TripTitle({ trip }) {
+function TripTitle({
+  trip = { name: 'Loading...', date: undefined, duration: undefined },
+}) {
   const { date, duration, name } = trip;
   const formattedDate = date ? format(date, 'dd.MM.yyyy') : '';
   const hasDate = typeof duration === 'number' && !Number.isNaN(+duration);
