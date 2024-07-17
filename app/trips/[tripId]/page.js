@@ -16,8 +16,10 @@ import { useTrip } from './useTrip';
 import { useMap } from './useMap';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import toast from 'react-hot-toast';
 
 export default function Page({ params }) {
+  // redux?
   const queryClient = useQueryClient();
   const [isEditingSession, setIsEditingSession] = useState(false);
   const [tripMap, setTripMap] = useState(null);
@@ -71,13 +73,16 @@ export default function Page({ params }) {
         // move map to marker's location
         tripMap.easeTo({
           center: coordinates,
-          padding: { left: window.innerWidth * 0.5 },
+          padding: { left: window.innerWidth * 0.05 },
           duration: 1000,
         });
         setNewLocationCoordinates([+coordinates.lng, +coordinates.lat]);
       }
       if (isEditingSession) {
         // If editing - add form to create locations
+        toast('Click the map to add location!', {
+          icon: '🏙️',
+        });
         tripMap.on('click', handleClick);
         tripMap.getCanvas().style.cursor = 'crosshair';
       }
@@ -93,15 +98,11 @@ export default function Page({ params }) {
       const bounds = new mapboxgl.LngLatBounds();
       fillGeoArrays(trip?.locations, bounds);
       // adding padding to the map
-      tripMap?.fitBounds(bounds, {
-        padding: {
-          top: 120,
-          bottom: 120,
-          left: 120,
-          right: 120,
-        },
-        duration: 3000,
-      });
+      if (!isEditingSession)
+        tripMap?.fitBounds(bounds, {
+          padding: 100,
+          duration: 3000,
+        });
     }
   }, [trip, tripMap]);
 
@@ -200,7 +201,7 @@ export default function Page({ params }) {
       tripMap.on('click', 'locations', (e) => {
         tripMap.easeTo({
           center: e.features[0].geometry.coordinates,
-          padding: { right: window.innerWidth * 0.5 },
+          padding: { bottom: window.innerHeight * 0.2 },
           duration: 1000,
         });
       });
@@ -274,7 +275,7 @@ export default function Page({ params }) {
           />
         )}
 
-        <div className="absolute z-50 left-16 top-[100px] flex flex-col gap-2 items-start">
+        <div className="absolute z-50 left-4 sm:left-16 top-[90px] sm:top-[100px] flex flex-col gap-2 items-start">
           <TripTitle trip={trip} />
 
           {travelers?.length !== 0 && (

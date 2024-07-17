@@ -59,7 +59,6 @@ export async function addLocationToTrip(data) {
       { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
       { new: true },
     );
-
     return JSON.parse(JSON.stringify(modTrip));
   } catch (err) {
     console.error(err);

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addLocationToTrip } from '@/app/_lib/actions';
+import toast from 'react-hot-toast';
 
 export function useEditTrip() {
   const queryClient = useQueryClient();
@@ -7,14 +8,16 @@ export function useEditTrip() {
   const { mutate: editTrip, isLoading: isEditing } = useMutation({
     mutationFn: (data) => addLocationToTrip(data),
     onSuccess: () => {
-      // console.log('\x1b[33m%s\x1b[0m', 'trip is modified!!');
       // Invalidate all queries with 'trip' in the query key
       queryClient.invalidateQueries({
         predicate: (query) =>
-          query.queryKey.some((key) => key.includes('trip')),
+          query.queryKey.some(
+            (key) => typeof key === 'string' && key.includes('trip'),
+          ),
       });
+      toast.success('Location added to the trip!');
     },
-    onError: (error) => console.error(error.message),
+    onError: (error) => toast.error(error.message),
   });
 
   return { isEditing, editTrip };

@@ -7,6 +7,7 @@ import back from '@/public/back.jpg';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
+import { Toaster } from 'react-hot-toast';
 
 const raleway = Raleway({ subsets: ['latin'] });
 
@@ -37,6 +38,27 @@ export default function RootLayout({ children }) {
         <Header>
           <Logo />
         </Header>
+
+        <Toaster
+          position="top-center"
+          gutter={12}
+          containerStyle={{ margin: '8px' }}
+          toastOptions={{
+            success: {
+              duration: 2000,
+            },
+            error: {
+              duration: 3000,
+            },
+            style: {
+              fontSize: '18px',
+              maxWidth: '500px',
+              padding: '14px 20px',
+              backgroundColor: 'var(--color-lightest)',
+              color: 'var(--color-grey-700)',
+            },
+          }}
+        />
 
         <Providers>{children}</Providers>
       </body>
