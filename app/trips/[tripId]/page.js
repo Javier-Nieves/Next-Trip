@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { FaCompass, FaFlag } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 import mapboxgl from '!mapbox-gl';
 import { createFeature, createGeoJSON } from '@/app/_lib/mapbox';
 import Spinner from '@/app/_components/Spinner';
@@ -9,41 +11,44 @@ import TripDescription from '@/app/_components/TripDescription';
 import LocationInfo from '@/app/_components/LocationInfo';
 import PhotoLink from '@/app/_components/PhotoLink';
 import TripTitle from '../../_components/TripTitle';
-import AddLocationsButton from '../../_components/AddLocationsButton';
 import IsHikeToggle from '../../_components/IsHikeToggle';
 import NewLocationForm from '../../_components/NewLocationForm';
 import { useTrip } from './useTrip';
 import { useMap } from './useMap';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import toast from 'react-hot-toast';
+import Button from '@/app/_components/Button';
 
 export default function Page({ params }) {
-  // redux?
+  // todo! redux?
   const queryClient = useQueryClient();
   const [isEditingSession, setIsEditingSession] = useState(false);
-  const [tripMap, setTripMap] = useState(null);
   const [regenerateMap, setRegenerateMap] = useState(false);
   const [newLocationCoordinates, setNewLocationCoordinates] = useState([]);
   const [locationInfo, setLocationInfo] = useState(null);
   const [isHike, setIsHike] = useState(false);
+  const [mapIsCreated, setMapIsCreated] = useState(false);
   // waypoints - array for GeoJson creation => routes
-  const [waypoints, setWaypoints] = useState([]);
+  const waypoints = useRef([]);
   // features - array for the map.addSource method, contains Locations data
-  const [features, setFeatures] = useState([]);
-
+  let features = useRef([]);
   const mapContainer = useRef(null);
+  const tripMap = useRef(null);
 
   //! 1) get trip info & display map
   const { trip, isLoading } = useTrip(params.tripId);
   const result = useMap(mapContainer.current, trip?.locations);
-  // queryClient.invalidateQueries({ queryKey: ['map'] });
   // result is a Promise, it should be awaited
   useEffect(() => {
     async function getTripMap() {
-      const { map } = await result;
-      setTripMap(map);
-      setIsHike(() => trip?.isHike);
+      if (!trip || !result) return;
+      const { map, mapIsLoading } = await result;
+      setIsHike(trip?.isHike);
+      if (!mapIsLoading && !mapIsCreated) {
+        // console.log('1) setting map');
+        setMapIsCreated(true);
+        tripMap.current = map;
+      }
     }
     getTripMap();
   }, [result, trip]);
@@ -51,89 +56,96 @@ export default function Page({ params }) {
   //! 2) invalidate map query when map is regenerated (after editing)
   useEffect(() => {
     if (regenerateMap) {
+      // console.log('map regeneration');
       mapContainer.current.innerHTML = '';
-      queryClient.invalidateQueries('map');
+      queryClient.invalidateQueries({
+        predicate: (query) =>
+          query.queryKey.some(
+            (key) => typeof key === 'string' && key.includes('map'),
+          ),
+      });
+      setMapIsCreated(false);
       setRegenerateMap(() => false);
     }
-  }, [queryClient, mapContainer.current, regenerateMap]);
+  }, [mapContainer.current, regenerateMap]);
 
   //! 3) convert map to editing if needed
   useEffect(() => {
     async function convertToEditing() {
-      // console.log('\x1b[36m%s\x1b[0m', '3');
-      if (!tripMap) return;
+      if (!tripMap.current) return;
       function handleClick(event) {
         // remove previous marker
         document.querySelector('.mapboxgl-marker')?.remove();
         // add marker to the click coordinates
         const coordinates = event.lngLat;
-        const marker = new mapboxgl.Marker()
-          .setLngLat(coordinates)
-          .addTo(tripMap);
+        new mapboxgl.Marker().setLngLat(coordinates).addTo(tripMap.current);
         // move map to marker's location
-        tripMap.easeTo({
+        tripMap.current.easeTo({
           center: coordinates,
-          padding: { left: window.innerWidth * 0.05 },
+          // padding: { left: window.innerWidth * 0.05 },
           duration: 1000,
         });
         setNewLocationCoordinates([+coordinates.lng, +coordinates.lat]);
       }
       if (isEditingSession) {
+        // console.log('\x1b[36m%s\x1b[0m', 'Converting to editing');
         // If editing - add form to create locations
         toast('Click the map to add location!', {
           icon: '🏙️',
         });
-        tripMap.on('click', handleClick);
-        tripMap.getCanvas().style.cursor = 'crosshair';
+        tripMap.current.on('click', handleClick);
+        tripMap.current.getCanvas().style.cursor = 'crosshair';
       }
     }
     convertToEditing();
-  }, [isEditingSession, isHike, tripMap]);
+  }, [isEditingSession, tripMap.current]);
 
   //! 4) filling arrays
   useEffect(() => {
     if (trip?.locations.length > 0) {
+      console.log('\x1b[35m%s\x1b[0m', '2) filling arrays');
       // locations and routes are created on the map via new layers
       // layers use Sourses, which are filled from arrays:
       const bounds = new mapboxgl.LngLatBounds();
       fillGeoArrays(trip?.locations, bounds);
       // adding padding to the map
       if (!isEditingSession)
-        tripMap?.fitBounds(bounds, {
+        tripMap.current?.fitBounds(bounds, {
           padding: 100,
           duration: 3000,
         });
     }
-  }, [trip, tripMap]);
+  }, [trip, tripMap.current]);
 
   //! 5) creating locations layer
   useEffect(() => {
-    // console.log('\x1b[36m%s\x1b[0m', 'effect 3', features.length);
-    if (features.length > 0) {
+    if (features.current.length > 0 && mapIsCreated) {
+      console.log('\x1b[32m%s\x1b[0m', '3) Locations layer');
       createLocationsLayer();
       populatePopups();
     }
-  }, [features, tripMap]);
+  }, [trip, features.current, mapIsCreated, tripMap.current]);
 
   //! 6) getting GeoJSON data for location points
   useEffect(() => {
     async function plotPath() {
-      // console.log('\x1b[36m%s\x1b[0m', '4');
       // remove marker from map
       document.querySelector('.mapboxgl-marker')?.remove();
-      if (!waypoints.length) return;
-      const routeData = await createGeoJSON(waypoints, isHike);
+      console.log('\x1b[36m%s\x1b[0m', '4) Plotting path', waypoints.current);
 
-      if (!tripMap?.getSource('route'))
-        tripMap?.addSource('route', {
+      if (!waypoints.current.length || !tripMap.current) return;
+      const routeData = await createGeoJSON(waypoints.current, isHike);
+
+      if (!tripMap.current?.getSource('route'))
+        tripMap.current?.addSource('route', {
           type: 'geojson',
           data: routeData,
         });
-      else tripMap?.getSource('route').setData(routeData);
+      else tripMap.current?.getSource('route').setData(routeData);
       drawRoute(routeData);
     }
     plotPath();
-  }, [waypoints, isHike, tripMap]);
+  }, [waypoints.current, isHike, tripMap.current, trip]);
 
   function fillGeoArrays(locations, bounds) {
     if (!locations?.length) return;
@@ -155,37 +167,35 @@ export default function Page({ params }) {
       // extend map's bounds to include location
       bounds.extend(loc.coordinates);
     });
-    setWaypoints(() => [...newWaypoints]);
-    setFeatures(() => [...newFeatures]);
+    waypoints.current = newWaypoints;
+    features.current = newFeatures;
   }
   function createLocationsLayer() {
     // updating layer's source if new feature is added
-    if (tripMap?.getSource('locations'))
-      tripMap.getSource('locations').setData({
+    if (tripMap.current?.getSource('locations'))
+      tripMap.current.getSource('locations').setData({
         type: 'FeatureCollection',
-        features,
+        features: features.current,
       });
 
-    tripMap?.on('load', () => {
-      // console.log('\x1b[32m%s\x1b[0m', 'creating location layer 2');
-      if (!tripMap) return;
+    tripMap.current?.on('load', () => {
       // creating source for the Locations layer
-      if (tripMap?.getSource('locations'))
-        tripMap.getSource('locations').setData({
+      if (tripMap.current?.getSource('locations'))
+        tripMap.current.getSource('locations').setData({
           type: 'FeatureCollection',
-          features,
+          features: features.current,
         });
       else
-        tripMap.addSource('locations', {
+        tripMap.current.addSource('locations', {
           type: 'geojson',
           data: {
             type: 'FeatureCollection',
-            features,
+            features: features.current,
           },
         });
       // creating Locations layer
-      if (!tripMap.getLayer('locations')) {
-        tripMap.addLayer({
+      if (!tripMap.current.getLayer('locations')) {
+        tripMap.current.addLayer({
           id: 'locations',
           type: 'circle',
           source: 'locations',
@@ -197,9 +207,9 @@ export default function Page({ params }) {
           },
         });
       }
-      // center tripMap on clicked location (with padding to the right)
-      tripMap.on('click', 'locations', (e) => {
-        tripMap.easeTo({
+      // center tripMap.current on clicked location (with padding to the right)
+      tripMap.current.on('click', 'locations', (e) => {
+        tripMap.current.easeTo({
           center: e.features[0].geometry.coordinates,
           padding: { bottom: window.innerHeight * 0.2 },
           duration: 1000,
@@ -212,31 +222,32 @@ export default function Page({ params }) {
       closeButton: false,
       closeOnClick: false,
     });
-    tripMap?.on('mouseenter', 'locations', (e) => {
-      tripMap.getCanvas().style.cursor = 'pointer';
+    tripMap.current?.on('mouseenter', 'locations', (e) => {
+      tripMap.current.getCanvas().style.cursor = 'pointer';
       const coordinates = e.features[0].geometry.coordinates.slice();
       const description = e.features[0].properties.description;
       // Populate the popup and set its coordinates
-      popup.setLngLat(coordinates).setHTML(description).addTo(tripMap);
+      popup.setLngLat(coordinates).setHTML(description).addTo(tripMap.current);
     });
     // hide popup when cursor leaves
-    tripMap?.on('mouseleave', 'locations', () => {
-      tripMap.getCanvas().style.cursor = 'crosshair';
+    tripMap.current?.on('mouseleave', 'locations', () => {
+      tripMap.current.getCanvas().style.cursor = 'crosshair';
       popup.remove();
     });
     // clicking on the Location
-    tripMap?.on('click', 'locations', (e) => {
+    tripMap.current?.on('click', 'locations', (e) => {
       const locationInfo = e.features[0].properties;
       setLocationInfo(() => locationInfo);
     });
   }
   function drawRoute(routeData) {
     if (!routeData) return;
-    if (!tripMap) return;
-    if (tripMap.getLayer('route-layer')) tripMap.removeLayer('route-layer');
+    if (!tripMap.current) return;
+    if (tripMap.current.getLayer('route-layer'))
+      tripMap.current.removeLayer('route-layer');
 
-    tripMap.getSource('route').setData(routeData);
-    tripMap.addLayer({
+    tripMap.current.getSource('route').setData(routeData);
+    tripMap.current.addLayer({
       id: 'route-layer',
       type: 'line',
       source: 'route',
@@ -251,15 +262,23 @@ export default function Page({ params }) {
       filter: ['==', '$type', 'LineString'],
     });
     // for Routes layer to be lower than Locations
-    if (tripMap.getLayer('route-layer') && tripMap.getLayer('locations'))
-      tripMap.moveLayer('route-layer', 'locations');
+    if (
+      tripMap.current.getLayer('route-layer') &&
+      tripMap.current.getLayer('locations')
+    )
+      tripMap.current.moveLayer('route-layer', 'locations');
   }
 
+  function handleAddLocation() {
+    isEditingSession && setRegenerateMap(() => true);
+    setIsEditingSession((cur) => !cur);
+    setLocationInfo(null);
+  }
   const { description = '', highlight = '', travelers = [] } = trip || {};
 
   return (
     <>
-      {(!tripMap || isLoading) && <Spinner />}
+      {(!tripMap.current || isLoading) && <Spinner />}
 
       <div className="fixed top-0 left-0 w-screen h-screen">
         {/* trip details */}
@@ -275,7 +294,7 @@ export default function Page({ params }) {
           />
         )}
 
-        <div className="absolute z-50 left-4 sm:left-16 top-[90px] sm:top-[100px] flex flex-col gap-2 items-start">
+        <div className="absolute z-50 left-4 sm:left-16 top-[80px] flex flex-col gap-2 items-center p-3">
           <TripTitle trip={trip} />
 
           {travelers?.length !== 0 && (
@@ -287,12 +306,19 @@ export default function Page({ params }) {
           )}
 
           {trip?.isMyTrip && (
-            <AddLocationsButton
-              isEditingSession={isEditingSession}
-              setRegenerateMap={setRegenerateMap}
-              setIsEditingSession={setIsEditingSession}
-              setLocationInfo={setLocationInfo}
-            />
+            <Button onClick={handleAddLocation}>
+              {isEditingSession ? (
+                <>
+                  <FaFlag />
+                  Back to the trip
+                </>
+              ) : (
+                <>
+                  <FaCompass />
+                  Add location
+                </>
+              )}
+            </Button>
           )}
 
           {trip?.isMyTrip && isEditingSession && (

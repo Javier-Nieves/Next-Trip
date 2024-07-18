@@ -8,9 +8,11 @@ function TripTitle({
   const hasDate = typeof duration === 'number' && !Number.isNaN(+duration);
   return (
     <>
-      <div className="text-4xl font-semibold">{name}</div>
+      <div className="text-4xl font-semibold rounded-lg backdrop-blur-sm bg-[var(--color-grey-tr)] p-2">
+        {name}
+      </div>
       {hasDate && (
-        <div className="text-xl font-normal">
+        <div className="text-xl font-normal rounded-lg backdrop-blur-sm bg-[var(--color-grey-tr)] p-2">
           {formattedDate}, {duration} {duration > 1 ? 'days' : 'day'}
         </div>
       )}

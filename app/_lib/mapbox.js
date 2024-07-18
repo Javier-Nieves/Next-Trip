@@ -62,6 +62,7 @@ export async function createGeoJSON(waypoints, isHike) {
   const keyData = await fetch('/api/trips');
   const data = await keyData.json();
   const API_KEY = data.geoKey;
+  // console.log('hiking? ', isHike);
   const res = await fetch(
     `https://api.geoapify.com/v1/routing?waypoints=${wayPointsString}&mode=${isHike ? 'hike' : 'drive'}&apiKey=${API_KEY}`,
   );
