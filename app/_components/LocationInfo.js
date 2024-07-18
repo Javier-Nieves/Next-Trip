@@ -1,4 +1,9 @@
+import Button from '@/app/_components/Button';
+import { FaTrashAlt } from 'react-icons/fa';
+import { useRemoveLocation } from '@/app/trips/[tripId]/useRemoveLocation';
+
 function LocationInfo({ location, setLocationInfo }) {
+  const { removeLocation } = useRemoveLocation();
   const images = JSON.parse(location.images);
   let columns;
   switch (images.length) {
@@ -11,6 +16,10 @@ function LocationInfo({ location, setLocationInfo }) {
       break;
     default:
       columns = 3;
+  }
+  async function handleDeleteLocation(name) {
+    removeLocation(name);
+    setLocationInfo(null);
   }
 
   return (
@@ -45,6 +54,13 @@ function LocationInfo({ location, setLocationInfo }) {
             </span>
           </p>
         )}
+        <Button
+          type="delete"
+          onClick={() => handleDeleteLocation(location.name)}
+        >
+          <FaTrashAlt />
+          Delete
+        </Button>
       </div>
     </div>
   );

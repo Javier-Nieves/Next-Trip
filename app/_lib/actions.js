@@ -9,7 +9,6 @@ import { handlers, auth, signIn, signOut } from './auth';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
-import { format } from 'path';
 
 export async function signInAction() {
   await signIn('google', { redirectTo: '/account' });
@@ -34,6 +33,55 @@ export async function createTrip(data) {
 
 export async function addLocationToTrip(data) {
   try {
+    const tripId = await getTripId();
+    const filteredData = filterData(
+      data,
+      'name',
+      'address',
+      'description',
+      'coordinates',
+      'isHike',
+      'images',
+    );
+    const newLocation = await Location.create({
+      ...filteredData,
+      trip: tripId,
+    });
+    const modTrip = await Trip.findByIdAndUpdate(
+      tripId,
+      { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
+      { new: true },
+    );
+    return JSON.parse(JSON.stringify(modTrip));
+  } catch (err) {
+    console.error(err);
+    throw new Error(`Couldn't create new location. ${err.message}`);
+  }
+}
+
+export async function deleteLocationFromTrip(name) {
+  try {
+    const tripId = await getTripId();
+    const location = await Location.findOne({ trip: tripId, name });
+    const imageUrls = location.images;
+    // remove Location from the Trip
+    await Trip.findByIdAndUpdate(
+      tripId,
+      { $pull: { locations: location._id } },
+      { new: true },
+    );
+    // delete Location
+    await Location.findByIdAndDelete(location._id);
+    // send back URLs for deletion
+    return JSON.parse(JSON.stringify(imageUrls));
+  } catch (err) {
+    console.error(err);
+    throw new Error(`Couldn't delete location. ${err.message}`);
+  }
+}
+
+async function getTripId() {
+  try {
     const headersList = headers();
     // read the custom x-url header to get tripId
     const header_url = headersList.get('x-url') || '';
@@ -44,25 +92,10 @@ export async function addLocationToTrip(data) {
     const session = await auth();
     if (!trip.createdBy === session.user.id) return;
 
-    const filteredData = filterData(
-      data,
-      'name',
-      'address',
-      'description',
-      'coordinates',
-      'isHike',
-      'images',
-    );
-    const newLocation = await Location.create(filteredData);
-    const modTrip = await Trip.findByIdAndUpdate(
-      tripId,
-      { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
-      { new: true },
-    );
-    return JSON.parse(JSON.stringify(modTrip));
+    return tripId;
   } catch (err) {
-    console.error(err);
-    throw new Error(`Couldn't create new location. ${err.message}`);
+    console.error('API error: ', err.message);
+    toast.error(err.message);
   }
 }
 

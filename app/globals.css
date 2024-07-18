@@ -12,6 +12,8 @@
   --color-accent-base: rgb(201, 135, 175);
   --color-accent-dark: rgb(170, 88, 138);
   --color-accent-darkest: rgb(135, 46, 100);
+  --color-danger: rgb(247, 73, 73);
+  --color-danger-dark: rgb(186, 31, 31);
   /* react */
   --background-start-rgb: 249, 246, 235;
   --background-end-rgb: 159, 159, 147;

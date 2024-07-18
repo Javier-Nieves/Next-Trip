@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { MultiImageDropzoneUsage } from './MultiImageDropzoneUsage';
-import { useEditTrip } from '@/app/trips/[tripId]/useEditTrip';
+import { useAddLocation } from '@/app/trips/[tripId]/useAddLocation';
+import { FaTram } from 'react-icons/fa';
 
 function NewLocationForm({
   isHike,
@@ -12,7 +13,7 @@ function NewLocationForm({
   const { register, handleSubmit } = useForm();
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { isEditing, editTrip } = useEditTrip();
+  const { isEditing, addLocation } = useAddLocation();
 
   async function onSubmit(data) {
     try {
@@ -27,22 +28,28 @@ function NewLocationForm({
         images: uploadedImages,
         isHike,
       };
-      // console.log('updated data:', fullData);
-      // todo! make if a mutation with query invalidation
-      editTrip(fullData);
-      // const modifiedTrip = await addLocationToTrip(fullData);
-      // console.log('\x1b[34m%s\x1b[0m', 'success', newLocation);
+      addLocation(fullData);
       setNewLocationCoordinates([]);
     } catch (err) {
       console.error(err);
     }
   }
 
+  const handleCloseForm = (event) => {
+    // to close new location form when user clicked outside of the form
+    if (event.target === event.currentTarget) {
+      setNewLocationCoordinates([]);
+    }
+  };
+
   return (
-    <div className="absolute z-50 w-[450px] mx-10 flex items-center justify-center min-h-screen">
+    <div
+      className="absolute z-50 flex items-end justify-center w-full min-h-screen lg:mx-10"
+      onClick={handleCloseForm}
+    >
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="flex flex-col items-center justify-center gap-4 p-4 bg-[var(--color-light-yellow)] rounded-lg relative"
+        className="flex flex-col items-center justify-center gap-4 p-4 bg-[var(--color-light-yellow)] rounded-lg relative mb-5 lg:ml-[50%] lg:mb-[10%]"
       >
         <button
           onClick={() => setNewLocationCoordinates([])}
@@ -92,8 +99,9 @@ function NewLocationForm({
 
         <button
           disabled={isLoading}
-          className={`${isLoading ? 'bg-stone-500' : 'bg-[var(--color-accent-base)]'} ${!isLoading ? 'hover:bg-[var(--color-accent-dark)]' : ''} p-2 mt-2 rounded-md text-lg`}
+          className={`${isLoading ? 'bg-stone-500' : 'bg-[var(--color-accent-base)]'} ${!isLoading ? 'hover:bg-[var(--color-accent-dark)]' : ''} flex items-center gap-2 p-2 mt-2 rounded-md text-lg`}
         >
+          <FaTram />
           {isLoading ? 'Loading...' : 'Create'}
         </button>
       </form>
