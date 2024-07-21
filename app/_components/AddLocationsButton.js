@@ -1,20 +1,21 @@
-function AddLocationsButton({
-  isEditingSession,
-  setRegenerateMap,
-  setIsEditingSession,
-  setLocationInfo,
-}) {
+import { FaCompass, FaFlag } from 'react-icons/fa';
+import Button from '@/app/_components/Button';
+
+function AddLocationsButton({ handleAddLocation, isEditingSession }) {
   return (
-    <button
-      onClick={() => {
-        isEditingSession && setRegenerateMap(() => true);
-        setIsEditingSession((cur) => !cur);
-        setLocationInfo(null);
-      }}
-      className={`${isEditingSession ? 'bg-[var(--color-accent-base)] hover:bg-[var(--color-accent-dark)]' : 'bg-[var(--color-light-yellow)] hover:bg-[var(--color-yellow)]'} p-2 mt-2 rounded-md text-lg`}
-    >
-      {isEditingSession ? 'Back to trip' : 'Add locations'}
-    </button>
+    <Button onClick={handleAddLocation}>
+      {isEditingSession ? (
+        <>
+          <FaFlag />
+          Back to the trip
+        </>
+      ) : (
+        <>
+          <FaCompass />
+          Edit locations
+        </>
+      )}
+    </Button>
   );
 }
 

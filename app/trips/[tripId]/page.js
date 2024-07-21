@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { FaCompass, FaFlag } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import mapboxgl from '!mapbox-gl';
 import { createFeature, createGeoJSON } from '@/app/_lib/mapbox';
@@ -10,14 +9,16 @@ import Spinner from '@/app/_components/Spinner';
 import TripDescription from '@/app/_components/TripDescription';
 import LocationInfo from '@/app/_components/LocationInfo';
 import PhotoLink from '@/app/_components/PhotoLink';
-import TripTitle from '../../_components/TripTitle';
-import IsHikeToggle from '../../_components/IsHikeToggle';
-import NewLocationForm from '../../_components/NewLocationForm';
+import TripTitle from '@/app/_components/TripTitle';
+import IsHikeToggle from '@/app/_components/IsHikeToggle';
+import NewLocationForm from '@/app/_components/NewLocationForm';
+import AddLocationsButton from '@/app/_components/AddLocationsButton';
+import DeleteTripButton from '@/app/_components/DeleteTripButton';
+import EditTripButton from '@/app/_components/EditTripButton';
 import { useTrip } from './useTrip';
 import { useMap } from './useMap';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import Button from '@/app/_components/Button';
 
 export default function Page({ params }) {
   // todo! redux?
@@ -37,7 +38,7 @@ export default function Page({ params }) {
 
   //! 1) get trip info & display map
   const { trip, isLoading } = useTrip(params.tripId);
-  const result = useMap(mapContainer.current, trip?.locations);
+  const result = useMap(mapContainer.current, trip);
   // result is a Promise, it should be awaited
   useEffect(() => {
     async function getTripMap() {
@@ -103,7 +104,6 @@ export default function Page({ params }) {
   //! 4) filling arrays
   useEffect(() => {
     if (trip?.locations.length > 0) {
-      console.log('\x1b[35m%s\x1b[0m', '2) filling arrays');
       // locations and routes are created on the map via new layers
       // layers use Sourses, which are filled from arrays:
       const bounds = new mapboxgl.LngLatBounds();
@@ -120,7 +120,6 @@ export default function Page({ params }) {
   //! 5) creating locations layer
   useEffect(() => {
     if (features.current.length > 0 && mapIsCreated) {
-      console.log('\x1b[32m%s\x1b[0m', '3) Locations layer');
       createLocationsLayer();
       populatePopups();
     }
@@ -131,9 +130,9 @@ export default function Page({ params }) {
     async function plotPath() {
       // remove marker from map
       document.querySelector('.mapboxgl-marker')?.remove();
-      console.log('\x1b[36m%s\x1b[0m', '4) Plotting path', waypoints.current);
 
       if (!waypoints.current.length || !tripMap.current) return;
+      // console.log('\x1b[36m%s\x1b[0m', '4) Plotting path', waypoints.current);
       const routeData = await createGeoJSON(waypoints.current, isHike);
 
       if (!tripMap.current?.getSource('route'))
@@ -294,7 +293,7 @@ export default function Page({ params }) {
           />
         )}
 
-        <div className="absolute z-50 left-4 sm:left-16 top-[80px] flex flex-col gap-2 items-center p-3">
+        <div className="absolute z-50 left-4 sm:left-16 top-[80px] flex flex-col gap-2 items-start p-3">
           <TripTitle trip={trip} />
 
           {travelers?.length !== 0 && (
@@ -306,19 +305,14 @@ export default function Page({ params }) {
           )}
 
           {trip?.isMyTrip && (
-            <Button onClick={handleAddLocation}>
-              {isEditingSession ? (
-                <>
-                  <FaFlag />
-                  Back to the trip
-                </>
-              ) : (
-                <>
-                  <FaCompass />
-                  Add location
-                </>
-              )}
-            </Button>
+            <>
+              <AddLocationsButton
+                handleAddLocation={handleAddLocation}
+                isEditingSession={isEditingSession}
+              />
+              <EditTripButton />
+              <DeleteTripButton />
+            </>
           )}
 
           {trip?.isMyTrip && isEditingSession && (

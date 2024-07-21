@@ -1,14 +1,15 @@
 'use server';
 
+import { redirect } from 'next/navigation';
+import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
+
 import Trip from '../models/tripModel';
 import Location from '../models/locationModel';
 import User from '../models/userModel';
 
 import connectToDatabase from './mongoose';
 import { handlers, auth, signIn, signOut } from './auth';
-import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
 
 export async function signInAction() {
   await signIn('google', { redirectTo: '/account' });
@@ -26,8 +27,8 @@ export async function createTrip(data) {
     'highlight', 'description', 'private', 'coverImage', 'createdAt', 'createdBy', 'isHike' );
 
   const newTrip = await Trip.create(filteredBody);
-  // console.log(newTrip);
   revalidatePath(`/`);
+  //! Redirect doesn't work inside try-catch blocks
   redirect(`/trips/${newTrip._id}`);
 }
 
@@ -80,6 +81,44 @@ export async function deleteLocationFromTrip(name) {
   }
 }
 
+export async function deleteTrip() {
+  try {
+    const tripId = await getTripId();
+    // console.log('API delete', tripId);
+    const trip = await Trip.findById(tripId);
+    const locationsArray = trip.locations;
+    const locationsToDelete = locationsArray.reduce(
+      (acc, cur) => [...acc, cur._id],
+      [],
+    );
+    const locationImages = locationsArray.reduce(
+      (acc, cur) => [...acc, ...cur.images],
+      [],
+    );
+    // add trip cover to delete it too. Exclude default picture.
+    const imagesToDelete = [...locationImages, trip.coverImage].filter(
+      (img) => img !== '/default-trip.jpeg',
+    );
+    const locDeletePromises = locationsToDelete.map((loc) =>
+      Location.findByIdAndDelete(loc),
+    );
+    await Promise.all(locDeletePromises);
+    await Trip.findByIdAndDelete(tripId);
+
+    revalidatePath(`/`);
+    // redirect('/');
+    // send back URLs for deletion
+    return JSON.parse(JSON.stringify(imagesToDelete));
+  } catch (err) {
+    console.error('trip deletion ', err);
+    throw new Error(`Couldn't delete trip. ${err.message}`);
+  }
+}
+
+export async function navigate(url = '/') {
+  redirect(url);
+}
+
 async function getTripId() {
   try {
     const headersList = headers();
@@ -90,7 +129,7 @@ async function getTripId() {
     await connectToDatabase();
     const trip = await Trip.findById(tripId);
     const session = await auth();
-    if (!trip.createdBy === session.user.id) return;
+    if (!trip?.createdBy === session.user.id) return;
 
     return tripId;
   } catch (err) {

@@ -12,9 +12,10 @@ import { MultiImageDropzoneUsage } from '../_components/MultiImageDropzoneUsage'
 import SmallToggle from '../_components/SmallToggle';
 import Button from '../_components/Button';
 import TravelersList from '../_components/TravelersList';
+import toast from 'react-hot-toast';
 
 export default function Page() {
-  // todo - useReducer
+  // todo - useReducer useRef?
   const initialRange = { from: undefined, to: undefined };
   const [range, setRange] = useState(initialRange);
   const [inputValue, setInputValue] = useState('');
@@ -29,7 +30,9 @@ export default function Page() {
     defaultValues: {},
   });
   //   const { errors } = formState;
-  const duration = +differenceInDays(range?.to, range?.from) + 1;
+  const duration = range?.to
+    ? +differenceInDays(range?.to, range?.from) + 1
+    : 0;
 
   // getting friends info to populate travelers selector and add userId to Trip object
   useEffect(function () {
@@ -53,7 +56,7 @@ export default function Page() {
   );
 
   async function onSubmit(data) {
-    let coverImage = uploadedImages.at(0) || '/public/default-trip.jpeg';
+    let coverImage = uploadedImages.at(0) || '/default-trip.jpeg';
     const completeData = {
       ...data,
       createdBy: userId.current,
@@ -65,9 +68,9 @@ export default function Page() {
     };
     // console.log('data', completeData);
     await createTrip(completeData);
+    toast.success('🏞️ New trip is created!');
     // clear form
     reset();
-    setFile(null);
     setRange(initialRange);
     setSelectedTravelers([]);
   }

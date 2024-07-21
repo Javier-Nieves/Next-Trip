@@ -6,7 +6,7 @@ import PhotoLink from './PhotoLink';
 
 async function TripCard({ trip, cardNumber }) {
   const { isFriend, isMe } = await getUserInfo(trip.createdBy);
-  const { user } = await getUserInfo(trip.travelers?.at(0));
+  const { user } = await getUserInfo(trip.travelers?.at(0) || trip.createdBy);
 
   const isBigCard = cardNumber < 3;
 
@@ -17,7 +17,7 @@ async function TripCard({ trip, cardNumber }) {
     <div
       className={`${
         isBigCard ? 'w-full' : 'md:w-4/5 md:mx-auto'
-      } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-[var(--color-darkest)] outline-offset-4' : ''} ${isMe ? 'outline outline-[var(--color-accent-darkest)]  outline-offset-4' : ''} hover:scale-[1.01] hover:cursor-pointer`}
+      } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-[var(--color-orange)] outline-offset-4' : ''} ${isMe ? 'outline outline-[var(--color-green)]  outline-offset-4' : ''} hover:scale-[1.01] hover:cursor-pointer`}
     >
       <Link href={`/trips/${trip.id}`}>
         <div className="relative h-1/2 md:h-2/3">
