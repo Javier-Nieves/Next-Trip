@@ -1,5 +1,6 @@
 import { Raleway } from 'next/font/google';
 import Image from 'next/image';
+import { Toaster } from 'react-hot-toast';
 import Providers from '@/app/_components/Providers';
 import Header from './_components/Header';
 import Logo from './_components/Logo';
@@ -7,7 +8,6 @@ import back from '@/public/back.jpg';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './globals.css';
-import { Toaster } from 'react-hot-toast';
 
 const raleway = Raleway({ subsets: ['latin'] });
 

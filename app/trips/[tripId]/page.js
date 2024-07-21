@@ -44,9 +44,9 @@ export default function Page({ params }) {
     async function getTripMap() {
       if (!trip || !result) return;
       const { map, mapIsLoading } = await result;
-      setIsHike(trip?.isHike);
       if (!mapIsLoading && !mapIsCreated) {
         // console.log('1) setting map');
+        setIsHike(trip?.isHike);
         setMapIsCreated(true);
         tripMap.current = map;
       }
@@ -70,7 +70,7 @@ export default function Page({ params }) {
     }
   }, [mapContainer.current, regenerateMap]);
 
-  //! 3) convert map to editing if needed
+  // //! 3) convert map to editing if needed
   useEffect(() => {
     async function convertToEditing() {
       if (!tripMap.current) return;
@@ -79,7 +79,9 @@ export default function Page({ params }) {
         document.querySelector('.mapboxgl-marker')?.remove();
         // add marker to the click coordinates
         const coordinates = event.lngLat;
-        new mapboxgl.Marker().setLngLat(coordinates).addTo(tripMap.current);
+        let mark = new mapboxgl.Marker()
+          .setLngLat(coordinates)
+          .addTo(tripMap.current);
         // move map to marker's location
         tripMap.current.easeTo({
           center: coordinates,
@@ -104,6 +106,7 @@ export default function Page({ params }) {
   //! 4) filling arrays
   useEffect(() => {
     if (trip?.locations.length > 0) {
+      // console.log('\x1b[36m%s\x1b[0m', '2) Filling arrays');
       // locations and routes are created on the map via new layers
       // layers use Sourses, which are filled from arrays:
       const bounds = new mapboxgl.LngLatBounds();
@@ -120,6 +123,7 @@ export default function Page({ params }) {
   //! 5) creating locations layer
   useEffect(() => {
     if (features.current.length > 0 && mapIsCreated) {
+      // console.log('\x1b[36m%s\x1b[0m', '3) Locations layer');
       createLocationsLayer();
       populatePopups();
     }
@@ -131,7 +135,7 @@ export default function Page({ params }) {
       // remove marker from map
       document.querySelector('.mapboxgl-marker')?.remove();
 
-      if (!waypoints.current.length || !tripMap.current) return;
+      if (waypoints.current?.length < 2 || !tripMap.current) return;
       // console.log('\x1b[36m%s\x1b[0m', '4) Plotting path', waypoints.current);
       const routeData = await createGeoJSON(waypoints.current, isHike);
 
@@ -171,48 +175,53 @@ export default function Page({ params }) {
   }
   function createLocationsLayer() {
     // updating layer's source if new feature is added
-    if (tripMap.current?.getSource('locations'))
+    if (tripMap.current?.getSource('locations')) {
       tripMap.current.getSource('locations').setData({
         type: 'FeatureCollection',
         features: features.current,
       });
-
+    }
+    if (typeof tripMap.current === 'object') handleLocationLayer();
     tripMap.current?.on('load', () => {
-      // creating source for the Locations layer
-      if (tripMap.current?.getSource('locations'))
-        tripMap.current.getSource('locations').setData({
+      handleLocationLayer();
+    });
+  }
+  function handleLocationLayer() {
+    // creating source for the Locations layer
+    if (tripMap.current?.getSource('locations')) {
+      tripMap.current.getSource('locations').setData({
+        type: 'FeatureCollection',
+        features: features.current,
+      });
+    } else {
+      tripMap.current.addSource('locations', {
+        type: 'geojson',
+        data: {
           type: 'FeatureCollection',
           features: features.current,
-        });
-      else
-        tripMap.current.addSource('locations', {
-          type: 'geojson',
-          data: {
-            type: 'FeatureCollection',
-            features: features.current,
-          },
-        });
-      // creating Locations layer
-      if (!tripMap.current.getLayer('locations')) {
-        tripMap.current.addLayer({
-          id: 'locations',
-          type: 'circle',
-          source: 'locations',
-          paint: {
-            'circle-color': '#000012',
-            'circle-radius': 6,
-            'circle-stroke-width': 2,
-            'circle-stroke-color': '#ffffff',
-          },
-        });
-      }
-      // center tripMap.current on clicked location (with padding to the right)
-      tripMap.current.on('click', 'locations', (e) => {
-        tripMap.current.easeTo({
-          center: e.features[0].geometry.coordinates,
-          padding: { bottom: window.innerHeight * 0.2 },
-          duration: 1000,
-        });
+        },
+      });
+    }
+    // creating Locations layer
+    if (!tripMap.current.getLayer('locations')) {
+      tripMap.current.addLayer({
+        id: 'locations',
+        type: 'circle',
+        source: 'locations',
+        paint: {
+          'circle-color': '#000012',
+          'circle-radius': 6,
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff',
+        },
+      });
+    }
+    // center tripMap.current on clicked location (with padding to the right)
+    tripMap.current.on('click', 'locations', (e) => {
+      tripMap.current.easeTo({
+        center: e.features[0].geometry.coordinates,
+        padding: { bottom: window.innerHeight * 0.2 },
+        duration: 1000,
       });
     });
   }

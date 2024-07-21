@@ -52,6 +52,7 @@ export const createFeature = (loc) => {
 };
 
 export async function createGeoJSON(waypoints, isHike) {
+  console.log('\x1b[36m%s\x1b[0m', 'waypoints, isHike', waypoints, isHike);
   // 'hike' === less than 100km btw points
   let wayPointsString = '';
   waypoints.forEach((place) => {

@@ -6,7 +6,7 @@ export async function useMap(mapContainer, trip) {
     queryKey: ['map', trip?.name],
     queryFn: () => centeredMap(mapContainer, trip?.locations),
     // staleTime: 0,
-    enabled: Boolean(trip?.locations),
+    enabled: Boolean(trip?.locations && mapContainer?.innerHTML === ''),
   });
   // console.log('hook map', map);
   return { map, mapIsLoading: isLoading };

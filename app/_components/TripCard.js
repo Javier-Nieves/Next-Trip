@@ -11,7 +11,7 @@ async function TripCard({ trip, cardNumber }) {
   const isBigCard = cardNumber < 3;
 
   const formattedDate = trip.date ? format(trip.date, 'dd MMMM yyyy') : '';
-  // console.log(user);
+
   // Link is separates in two parts to avoid hydration error (nested Links don't work)
   return (
     <div
@@ -25,6 +25,8 @@ async function TripCard({ trip, cardNumber }) {
             src={trip.coverImage}
             alt={trip.name}
             fill
+            placeholder="blur"
+            blurDataURL={`/_next/image?url=${trip.coverImage}&w=16&q=1`}
             sizes="300px"
             className="object-cover w-full h-full"
           />

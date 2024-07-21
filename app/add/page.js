@@ -170,13 +170,14 @@ export default function Page() {
         locale={enGB}
         onSelect={setRange}
         selected={range}
-        fromMonth={new Date()}
-        fromDate={new Date()}
+        fromDate={new Date(1900, 0)}
         toYear={new Date().getFullYear() + 5}
         captionLayout="dropdown"
         numberOfMonths={isWideScreen ? 2 : 1}
       />
-      <Button disabled={isLoading}>Save</Button>
+      <Button disabled={isLoading} type="bright">
+        Save
+      </Button>
     </form>
   );
 }

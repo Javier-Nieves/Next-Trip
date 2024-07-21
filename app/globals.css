@@ -25,6 +25,15 @@
   --rdp-caption-font-size: 30px;
   --rdp-accent-color: indigo;
   --rdp-background-color: gray;
+  --rdp-accent-background-color: red;
+}
+.rdp-root {
+  /* react day picker */
+  --rdp-cell-size: 100px;
+  --rdp-caption-font-size: 30px;
+  --rdp-accent-color: indigo;
+  --rdp-background-color: gray;
+  --rdp-accent-background-color: red;
 }
 
 @media (prefers-color-scheme: dark) {
