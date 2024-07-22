@@ -1,77 +1,65 @@
 import Link from 'next/link';
 import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
+import ExpandableMenu from './ExpandableMenu';
 
 export default async function Navigation() {
   const session = await auth();
   const user = session?.user;
 
   return (
-    <nav className="text-2xl font-light">
-      <ul className="flex items-center gap-16">
-        <li className="hidden min-[630px]:block">
-          <Link
-            href="/search"
-            className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
-          >
+    <nav className="flex items-center gap-4 text-2xl font-light">
+      <ExpandableMenu>
+        <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+          <Link href="/search" className="w-full text-center">
             Search
           </Link>
         </li>
         {user && (
           <>
-            <li className="hidden lg:block">
+            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
               <Link
                 href={`/collections/${user?.id}`}
-                className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
+                className="w-full text-center"
               >
                 My trips
               </Link>
             </li>
-            <li className="hidden lg:block ">
-              <Link
-                href="/friends"
-                className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
-              >
+            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+              <Link href="/friends" className="w-full text-center">
                 My friends
               </Link>
             </li>
-            <li className="hidden lg:block ">
-              <Link
-                href="/add"
-                className="transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
-              >
+            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+              <Link href="/add" className="w-full text-center">
                 Add trip
               </Link>
             </li>
           </>
         )}
-        <li className="z-50">
-          {session?.user?.image ? (
-            <div className="flex gap-3">
-              <Link
-                href="/account"
-                className="flex items-center transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
-              >
-                <img
-                  src={session.user.image}
-                  className="w-12 border-2 border-white rounded-full aspect-square"
-                  alt={session.user.name}
-                  referrerPolicy="no-referrer"
-                ></img>
-                {/* <span className="hidden lg:block">Account</span> */}
-              </Link>
-              <SignOutButton />
-            </div>
-          ) : (
-            <Link
-              href="/login"
-              className="z-50 transition-colors hover:text-[var(--color-accent-darkest)] text-stone-700"
-            >
-              Login
+      </ExpandableMenu>
+      <div className="z-50">
+        {session?.user?.image ? (
+          <div className="flex gap-3">
+            <Link href="/account" className="flex items-center">
+              <img
+                src={session.user.image}
+                className="w-12 border-2 border-white rounded-full shadow-lg aspect-square"
+                alt={session.user.name}
+                referrerPolicy="no-referrer"
+              ></img>
             </Link>
-          )}
-        </li>
-      </ul>
+            <SignOutButton />
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="z-50 text-2xl font-medium hover:drop-shadow-lg"
+          >
+            Login
+          </Link>
+        )}
+      </div>
     </nav>
   );
 }

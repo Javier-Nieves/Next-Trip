@@ -5,6 +5,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import mapboxgl from '!mapbox-gl';
 import { createFeature, createGeoJSON } from '@/app/_lib/mapbox';
+import { useTrip } from './useTrip';
+import { useMap } from './useMap';
 import Spinner from '@/app/_components/Spinner';
 import TripDescription from '@/app/_components/TripDescription';
 import LocationInfo from '@/app/_components/LocationInfo';
@@ -15,8 +17,6 @@ import NewLocationForm from '@/app/_components/NewLocationForm';
 import AddLocationsButton from '@/app/_components/AddLocationsButton';
 import DeleteTripButton from '@/app/_components/DeleteTripButton';
 import EditTripButton from '@/app/_components/EditTripButton';
-import { useTrip } from './useTrip';
-import { useMap } from './useMap';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -70,7 +70,7 @@ export default function Page({ params }) {
     }
   }, [mapContainer.current, regenerateMap]);
 
-  // //! 3) convert map to editing if needed
+  //! 3) convert map to editing if needed
   useEffect(() => {
     async function convertToEditing() {
       if (!tripMap.current) return;
@@ -181,12 +181,14 @@ export default function Page({ params }) {
         features: features.current,
       });
     }
-    if (typeof tripMap.current === 'object') handleLocationLayer();
+    if (typeof tripMap.current === 'object' && isEditingSession)
+      handleLocationLayer();
     tripMap.current?.on('load', () => {
       handleLocationLayer();
     });
   }
   function handleLocationLayer() {
+    // console.log('\x1b[36m%s\x1b[0m', 'map', tripMap.current);
     // creating source for the Locations layer
     if (tripMap.current?.getSource('locations')) {
       tripMap.current.getSource('locations').setData({
