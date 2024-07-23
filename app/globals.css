@@ -15,11 +15,13 @@
   --color-danger: rgb(247, 73, 73);
   --color-danger-dark: rgb(186, 31, 31);
   --color-orange: rgb(243, 152, 49);
+  --color-dark-orange: rgb(208, 117, 14);
   --color-orange-tr-5: rgba(243, 153, 49, 0.9);
   --color-green: rgb(43, 105, 1);
-  --color-grey-tr: rgba(131, 131, 131, 0.2);
+  --color-grey-tr: rgba(243, 153, 49, 0.2);
+  /* --color-grey-tr: rgba(131, 131, 131, 0.2); */
   --color-grey-tr-5: rgba(131, 131, 131, 0.8);
-  --color-grey-tr-7: rgba(131, 131, 131, 0.9);
+  --color-grey-tr-7: rgba(131, 131, 131, 1);
   /* react */
   --background-start-rgb: 249, 246, 235;
   --background-end-rgb: 159, 159, 147;

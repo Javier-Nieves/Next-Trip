@@ -3,7 +3,7 @@ import { FaPencilAlt } from 'react-icons/fa';
 
 function EditTripButton() {
   return (
-    <Button>
+    <Button type="menu">
       <>
         <FaPencilAlt />
         Edit trip

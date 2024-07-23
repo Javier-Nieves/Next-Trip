@@ -9,7 +9,7 @@ function IsHikeToggle({ isHike, setIsHike }) {
         <FaWalking />
       </span>
       <div
-        className={`relative inline-flex items-center h-6 w-12 rounded-full transition-colors duration-300 ${isHike ? 'bg-[var(--color-accent-base)]' : 'bg-[var(--color-yellow)]'}`}
+        className={`relative inline-flex items-center h-6 w-12 rounded-full transition-colors duration-300 ${isHike ? 'bg-[var(--color-orange)]' : 'bg-[var(--color-yellow)]'}`}
         onClick={() => {
           // console.log('clicked', Date.now(), isHike);
           setIsHike((cur) => !cur);

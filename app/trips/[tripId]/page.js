@@ -14,11 +14,10 @@ import PhotoLink from '@/app/_components/PhotoLink';
 import TripTitle from '@/app/_components/TripTitle';
 import IsHikeToggle from '@/app/_components/IsHikeToggle';
 import NewLocationForm from '@/app/_components/NewLocationForm';
-import AddLocationsButton from '@/app/_components/AddLocationsButton';
-import DeleteTripButton from '@/app/_components/DeleteTripButton';
-import EditTripButton from '@/app/_components/EditTripButton';
+import TripActionsMenu from '@/app/_components/TripActionsMenu';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
+import AddLocationsButton from '@/app/_components/AddLocationsButton';
 
 export default function Page({ params }) {
   // todo! redux?
@@ -316,18 +315,20 @@ export default function Page({ params }) {
           )}
 
           {trip?.isMyTrip && (
-            <>
+            <TripActionsMenu
+              handleAddLocation={handleAddLocation}
+              isEditingSession={isEditingSession}
+            />
+          )}
+
+          {trip?.isMyTrip && isEditingSession && (
+            <div className="flex items-center gap-2">
               <AddLocationsButton
                 handleAddLocation={handleAddLocation}
                 isEditingSession={isEditingSession}
               />
-              <EditTripButton />
-              <DeleteTripButton />
-            </>
-          )}
-
-          {trip?.isMyTrip && isEditingSession && (
-            <IsHikeToggle isHike={isHike} setIsHike={setIsHike} />
+              <IsHikeToggle isHike={isHike} setIsHike={setIsHike} />
+            </div>
           )}
         </div>
 
