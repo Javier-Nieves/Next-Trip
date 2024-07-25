@@ -29,12 +29,16 @@ export async function centeredMap(mapContainer, locations) {
 }
 
 export const createFeature = (loc) => {
+  let photosText = '';
+  if (loc.images.length === 1) photosText = '1 photo';
+  if (loc.images.length > 1) photosText = `${loc.images.length} photos`;
   return {
     type: 'Feature',
     properties: {
       description: `
         <div class='location-description'>
-          <h3>${loc.name}</h3>
+          <h2>${loc.name}</h2>
+          <h3>${photosText}</h3>
         </div>
         `,
       name: loc.name,

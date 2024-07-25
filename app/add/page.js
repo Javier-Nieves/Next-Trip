@@ -43,6 +43,7 @@ export default function Page() {
       userId.current = data.data.userId;
       travelers.current = [...data.data.friends, data.data.user];
       setSelectedTravelers([data.data.user]);
+      document.querySelector('.mainTitle').innerHTML = 'Create Trip';
     }
     getFriends();
   }, []);
@@ -103,7 +104,7 @@ export default function Page() {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col items-center justify-center w-full mx-auto md:w-1/2"
     >
-      <h1 className="p-1 text-4xl">Create trip</h1>
+      {/* <h1 className="p-1 text-4xl">Create trip</h1> */}
       <div className="flex items-center">
         <div className="w-3/4">
           <input
@@ -153,7 +154,7 @@ export default function Page() {
             </datalist>
           </div>
 
-          <SmallToggle register={register}>Friends only:</SmallToggle>
+          <SmallToggle register={register}>Show only to friends:</SmallToggle>
         </div>
 
         <div>

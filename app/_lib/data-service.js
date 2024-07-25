@@ -42,16 +42,6 @@ export async function getUser(email) {
   } catch (err) {
     console.error(err.message);
   }
-  // {
-  //   _id: new ObjectId('66795378a059a9fb42c4ec22'),
-  //   name: 'Konstantin Nikolskiy',
-  //   email: 'otro.konstantin@gmail.com',
-  //   photo: 'default.jpg',
-  //   role: 'user',
-  //   friends: [ new ObjectId('65444d163218278ffd2104f2') ],
-  //   friendRequests: [],
-  //   active: true,
-  // }
 }
 
 export async function getUserInfo(id) {

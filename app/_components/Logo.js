@@ -1,7 +1,9 @@
+'use client';
+
 import { Dancing_Script } from 'next/font/google';
 import Image from 'next/image';
-import logo from '../../public/backpack.png';
 import Link from 'next/link';
+import logo from '../../public/backpack.png';
 
 const playFont = Dancing_Script({ subsets: ['latin'] });
 
@@ -16,7 +18,7 @@ function Logo() {
         alt="See the world logo"
       />
       <span
-        className={`${playFont.className} z-10 tracking-tight text-3xl min-[400px]:text-5xl font-extrabold`}
+        className={`mainTitle ${playFont.className} z-10 tracking-tight text-3xl min-[400px]:text-5xl font-extrabold`}
       >
         See the World
       </span>

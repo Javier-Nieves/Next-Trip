@@ -44,7 +44,7 @@ export default function Page({ params }) {
       if (!trip || !result) return;
       const { map, mapIsLoading } = await result;
       if (!mapIsLoading && !mapIsCreated) {
-        // console.log('1) setting map');
+        if (trip?.locations.length === 0) setIsEditingSession(true);
         setIsHike(trip?.isHike);
         setMapIsCreated(true);
         tripMap.current = map;
@@ -52,6 +52,14 @@ export default function Page({ params }) {
     }
     getTripMap();
   }, [result, trip]);
+
+  // 1.5) change app name to trip name and back
+  useEffect(() => {
+    if (!trip) return;
+    document.querySelector('.mainTitle').innerHTML = trip.name;
+    return () =>
+      (document.querySelector('.mainTitle').innerHTML = 'See the World');
+  }, [trip]);
 
   //! 2) invalidate map query when map is regenerated (after editing)
   useEffect(() => {
@@ -78,9 +86,7 @@ export default function Page({ params }) {
         document.querySelector('.mapboxgl-marker')?.remove();
         // add marker to the click coordinates
         const coordinates = event.lngLat;
-        let mark = new mapboxgl.Marker()
-          .setLngLat(coordinates)
-          .addTo(tripMap.current);
+        new mapboxgl.Marker().setLngLat(coordinates).addTo(tripMap.current);
         // move map to marker's location
         tripMap.current.easeTo({
           center: coordinates,
@@ -305,7 +311,6 @@ export default function Page({ params }) {
 
         <div className="absolute z-50 left-4 sm:left-16 top-[80px] flex flex-col gap-2 items-start p-3">
           <TripTitle trip={trip} />
-
           {travelers?.length !== 0 && (
             <div className="flex gap-2">
               {travelers.map((traveler) => (
@@ -334,6 +339,7 @@ export default function Page({ params }) {
 
         {locationInfo && (
           <LocationInfo
+            isMyTrip={trip?.isMyTrip}
             location={locationInfo}
             setLocationInfo={setLocationInfo}
           />

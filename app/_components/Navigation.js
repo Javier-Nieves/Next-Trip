@@ -1,8 +1,8 @@
 import Link from 'next/link';
+import { FaListUl } from 'react-icons/fa';
 import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
 import ExpandableMenu from './ExpandableMenu';
-import { FaListUl } from 'react-icons/fa';
 
 export default async function Navigation() {
   const session = await auth();

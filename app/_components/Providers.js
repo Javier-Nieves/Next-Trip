@@ -12,6 +12,7 @@ export default function Providers({ children }) {
         defaultOptions: {
           queries: {
             staleTime: 10 * 60 * 1000,
+            cacheTime: 0,
             // staleTime: 0,
           },
         },
