@@ -1,35 +1,31 @@
 {
   "env": {
     "browser": true,
-    "commonjs": true,
-    "es6": true,
+    "es2021": true,
     "node": true
   },
-  "parser": "babel-eslint",
   "extends": [
-    "eslint:recommended",
+    "airbnb",
+    "airbnb/hooks",
     "plugin:react/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings",
-    "plugin:jsx-a11y/recommended",
-    "prettier"
+    "plugin:react-hooks/recommended",
+    "next/core-web-vitals"
   ],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
     },
-    "ecmaVersion": 11,
+    "ecmaVersion": 12,
     "sourceType": "module"
+  },
+  "plugins": ["react", "react-hooks"],
+  "rules": {
+    "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "warn"
   },
   "settings": {
     "react": {
       "version": "detect"
     }
-  },
-  "plugins": ["react", "react-hooks"],
-  "rules": {
-    "react/react-in-jsx-scope": "off",
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
-    "react/display-name": 1
   }
 }

@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "dependencies": {
     "@edgestore/react": "^0.1.7",
@@ -38,6 +38,7 @@
     "@types/react": "18.3.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
+    "eslint-config-airbnb": "^19.0.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-import": "^2.29.1",

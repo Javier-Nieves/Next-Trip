@@ -11,7 +11,7 @@ function AddLocationsButton({
       {isEditingSession ? (
         <>
           <FaFlag />
-          Back to the trip
+          Save changes
         </>
       ) : (
         <>

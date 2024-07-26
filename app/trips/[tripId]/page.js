@@ -57,8 +57,12 @@ export default function Page({ params }) {
   useEffect(() => {
     if (!trip) return;
     document.querySelector('.mainTitle').innerHTML = trip.name;
-    return () =>
-      (document.querySelector('.mainTitle').innerHTML = 'See the World');
+    return () => {
+      queryClient.removeQueries({
+        predicate: () => true,
+      });
+      document.querySelector('.mainTitle').innerHTML = 'See the World';
+    };
   }, [trip]);
 
   //! 2) invalidate map query when map is regenerated (after editing)
@@ -66,11 +70,8 @@ export default function Page({ params }) {
     if (regenerateMap) {
       // console.log('map regeneration');
       mapContainer.current.innerHTML = '';
-      queryClient.invalidateQueries({
-        predicate: (query) =>
-          query.queryKey.some(
-            (key) => typeof key === 'string' && key.includes('map'),
-          ),
+      queryClient.removeQueries({
+        predicate: () => true,
       });
       setMapIsCreated(false);
       setRegenerateMap(() => false);
@@ -123,7 +124,7 @@ export default function Page({ params }) {
           duration: 3000,
         });
     }
-  }, [trip, tripMap.current]);
+  }, [trip, tripMap.current, mapIsCreated]);
 
   //! 5) creating locations layer
   useEffect(() => {
@@ -283,9 +284,9 @@ export default function Page({ params }) {
     )
       tripMap.current.moveLayer('route-layer', 'locations');
   }
-
   function handleAddLocation() {
-    isEditingSession && setRegenerateMap(() => true);
+    setRegenerateMap(true);
+    // isEditingSession && setRegenerateMap(() => true);
     setIsEditingSession((cur) => !cur);
     setLocationInfo(null);
   }
@@ -321,6 +322,7 @@ export default function Page({ params }) {
 
           {trip?.isMyTrip && (
             <TripActionsMenu
+              setRegenerateMap={setRegenerateMap}
               handleAddLocation={handleAddLocation}
               isEditingSession={isEditingSession}
             />
