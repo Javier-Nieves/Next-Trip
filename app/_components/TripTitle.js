@@ -13,7 +13,7 @@ function TripTitle({
         {name}
       </div> */}
       {hasDate && (
-        <div className="text-xl font-normal rounded-lg backdrop-blur-sm bg-[var(--color-grey-tr)] p-2">
+        <div className="text-2xl font-normal rounded-lg backdrop-blur-sm">
           {formattedDate}, {duration} {duration > 1 ? 'days' : 'day'}
         </div>
       )}

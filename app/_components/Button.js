@@ -1,6 +1,6 @@
 function Button({ children, disabled, type, onClick }) {
   let additionalClass =
-    'bg-[var(--color-accent-base)] hover:bg-[var(--color-accent-dark)] hover:text-white';
+    'bg-black hover:bg-[var(--color-grey-tr-7)] text-[var(--color-yellow)]';
   if (type === 'delete')
     additionalClass =
       'flex justify-center bg-[var(--color-danger)] w-full hover:bg-[var(--color-danger-dark)] hover:text-white';

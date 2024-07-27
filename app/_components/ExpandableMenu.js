@@ -34,7 +34,7 @@ function ExpandableMenu({ children, icon, type }) {
       </button>
       {isMenuOpen && (
         <ul
-          className={`absolute ${type === 'nav' ? '-left-36' : ''} z-50 w-48 mt-2 bg-[var(--color-orange-tr-5)] rounded-lg shadow-lg backdrop-blur-sm hover:rounded-lg`}
+          className={`absolute ${type === 'nav' ? '-left-36' : ''} z-[55] w-48 mt-2 bg-[var(--color-orange-tr-5)] rounded-lg shadow-lg backdrop-blur-sm hover:rounded-lg`}
         >
           {children}
         </ul>

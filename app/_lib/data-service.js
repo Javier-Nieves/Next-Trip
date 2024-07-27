@@ -8,12 +8,28 @@ import Location from '../models/locationModel';
 
 export async function getPublicTrips() {
   try {
-    await connectToDatabase();
-    const trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
-    // console.log('trips', trips);
+    // get session and connect to the DB
+    const [session] = await Promise.all([auth(), connectToDatabase()]);
+    const user = await User.findById(session?.user.id);
+
+    // if user is authenticated - show all public trips and private trips of user's friends
+    let trips = [];
+    if (!user)
+      trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
+    else {
+      trips = await Trip.find({
+        $or: [
+          { private: false },
+          { createdBy: { $in: user.friends } },
+          { createdBy: session.user.id },
+        ],
+      }).sort({ createdAt: -1 });
+    }
+
     return trips;
   } catch (err) {
     console.error(err.message);
+    throw new Error('Something went wrong. Could not get trips.');
   }
 }
 
@@ -47,9 +63,7 @@ export async function getUser(email) {
 export async function getUserInfo(id) {
   try {
     await connectToDatabase();
-    const user = await User.findById(id);
-    const session = await auth();
-    // console.log('getUserInfo', Boolean(session));
+    const [session, user] = await Promise.all([auth(), User.findById(id)]);
     return {
       user,
       name: user?.name,

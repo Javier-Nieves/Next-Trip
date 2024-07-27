@@ -61,7 +61,8 @@ export default function Page({ params }) {
       queryClient.removeQueries({
         predicate: () => true,
       });
-      document.querySelector('.mainTitle').innerHTML = 'See the World';
+      const title = document.querySelector('.mainTitle');
+      if (title) title.innerHTML = 'See the World';
     };
   }, [trip]);
 
@@ -285,8 +286,8 @@ export default function Page({ params }) {
       tripMap.current.moveLayer('route-layer', 'locations');
   }
   function handleAddLocation() {
-    setRegenerateMap(true);
-    // isEditingSession && setRegenerateMap(() => true);
+    // setRegenerateMap(true);
+    isEditingSession && setRegenerateMap(() => true);
     setIsEditingSession((cur) => !cur);
     setLocationInfo(null);
   }
@@ -312,11 +313,14 @@ export default function Page({ params }) {
 
         <div className="absolute z-50 left-4 sm:left-16 top-[80px] flex flex-col gap-2 items-start p-3">
           <TripTitle trip={trip} />
-          {travelers?.length !== 0 && (
-            <div className="flex gap-2">
-              {travelers.map((traveler) => (
-                <PhotoLink user={traveler} key={traveler._id} />
-              ))}
+
+          {trip?.isMyTrip && isEditingSession && (
+            <div className="flex items-center gap-2">
+              <AddLocationsButton
+                handleAddLocation={handleAddLocation}
+                isEditingSession={isEditingSession}
+              />
+              <IsHikeToggle isHike={isHike} setIsHike={setIsHike} />
             </div>
           )}
 
@@ -328,13 +332,11 @@ export default function Page({ params }) {
             />
           )}
 
-          {trip?.isMyTrip && isEditingSession && (
-            <div className="flex items-center gap-2">
-              <AddLocationsButton
-                handleAddLocation={handleAddLocation}
-                isEditingSession={isEditingSession}
-              />
-              <IsHikeToggle isHike={isHike} setIsHike={setIsHike} />
+          {travelers?.length !== 0 && (
+            <div className="flex gap-2">
+              {travelers.map((traveler) => (
+                <PhotoLink user={traveler} key={traveler._id} />
+              ))}
             </div>
           )}
         </div>

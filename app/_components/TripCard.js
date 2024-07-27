@@ -19,6 +19,19 @@ async function TripCard({ trip, cardNumber }) {
         isBigCard ? 'w-full' : 'md:w-4/5 md:mx-auto'
       } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-[var(--color-orange)] outline-offset-4' : ''} ${isMe ? 'outline outline-[var(--color-green)]  outline-offset-4' : ''} hover:scale-[1.01] hover:cursor-pointer`}
     >
+      {(isFriend || isMe) && (
+        <div
+          className={`absolute px-10 py-1 text-xs font-bold text-white origin-top-right transform rotate-45 ${isMe ? (trip.private ? 'bg-[var(--color-dark-green)]' : 'bg-[var(--color-green)]') : trip.private ? 'bg-[var(--color-dark-orange)]' : 'bg-[var(--color-orange)]'} top-14 -right-6 z-40`}
+        >
+          {isMe
+            ? trip.private
+              ? 'Private'
+              : 'My trip'
+            : trip.private
+              ? 'Private'
+              : 'Friend'}
+        </div>
+      )}
       <Link href={`/trips/${trip.id}`}>
         <div className="relative h-1/2 md:h-2/3">
           <Image
