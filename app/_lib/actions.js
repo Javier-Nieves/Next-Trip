@@ -12,7 +12,7 @@ import connectToDatabase from './mongoose';
 import { handlers, auth, signIn, signOut } from './auth';
 
 export async function signInAction() {
-  await signIn('google', { redirectTo: '/account' });
+  await signIn('google', { redirectTo: '/' });
 }
 
 export async function signOutAction() {

@@ -36,13 +36,21 @@ export async function getPublicTrips() {
 export async function getUserTrips(userId, showPrivateTrips = false) {
   try {
     await connectToDatabase();
-    // find all trip where User was a traveler
-    const trips = await Trip.find({
-      travelers: userId,
-      private: showPrivateTrips,
-    }).sort({
-      createdAt: 1,
-    });
+    // find all trip where User was a traveler or creator
+    let trips;
+    if (showPrivateTrips)
+      trips = await Trip.find({
+        $or: [{ travelers: userId }, { createdBy: userId }],
+      }).sort({
+        createdAt: 1,
+      });
+    else
+      trips = await Trip.find({
+        private: false,
+        $or: [{ travelers: userId }, { createdBy: userId }],
+      }).sort({
+        createdAt: 1,
+      });
     // console.log('trips', trips);
     return trips;
   } catch (err) {

@@ -48,7 +48,7 @@ export default async function Navigation() {
                 className="w-12 border-2 border-white rounded-full shadow-lg aspect-square"
                 alt={session.user.name}
                 referrerPolicy="no-referrer"
-              ></img>
+              />
             </Link>
             <SignOutButton />
           </div>

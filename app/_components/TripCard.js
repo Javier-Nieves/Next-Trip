@@ -6,7 +6,7 @@ import PhotoLink from './PhotoLink';
 
 async function TripCard({ trip, cardNumber }) {
   const { isFriend, isMe } = await getUserInfo(trip.createdBy);
-  const { user } = await getUserInfo(trip.travelers?.at(0) || trip.createdBy);
+  // const { user } = await getUserInfo(trip.travelers?.at(0) || trip.createdBy);
 
   const isBigCard = cardNumber < 3;
 
@@ -47,7 +47,8 @@ async function TripCard({ trip, cardNumber }) {
       </Link>
 
       <PhotoLink
-        user={user}
+        // user={user}
+        trip={trip}
         big={isBigCard}
         position={
           'absolute -translate-x-1/2 -translate-y-1/2 top-1/2 md:top-2/3 left-1/2'

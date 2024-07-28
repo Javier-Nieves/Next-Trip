@@ -18,10 +18,10 @@ export default async function Page({ params }) {
   const trips = await getUserTrips(params.userId, trustedIds.includes(myId));
 
   return (
-    <div className="flex flex-col m-auto">
-      <h1>{isMe ? 'My trips' : `Trips of ${name}`}</h1>
+    <div className="flex flex-col items-center justify-center">
+      <h1 className="text-4xl">{isMe ? 'My trips' : `Trips of ${name}`}</h1>
       <h1>{!isMe ? (isFriend ? 'Your friend!' : 'Just a bloke') : ''}</h1>
-      <article className="grid grid-cols-3 gap-8 w-full">
+      <article className="grid w-full grid-cols-4 gap-8 mt-8 lg:w-3/4">
         {trips.map((trip) => (
           <TripCard trip={trip} key={trip._id} />
         ))}
