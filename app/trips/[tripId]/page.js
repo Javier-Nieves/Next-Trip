@@ -335,7 +335,11 @@ export default function Page({ params }) {
           {travelers?.length !== 0 && (
             <div className="flex gap-2">
               {travelers.map((traveler) => (
-                <PhotoLink user={traveler} key={traveler._id} />
+                <PhotoLink
+                  travelersArray={trip?.travelersArray}
+                  type="inTrip"
+                  key={traveler._id}
+                />
               ))}
             </div>
           )}

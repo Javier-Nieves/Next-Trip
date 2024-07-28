@@ -1,33 +1,15 @@
 import Link from 'next/link';
 import travelerImage from '../../public/user.png';
-import { getUserInfo } from '../_lib/data-service';
+import Spinner from './Spinner';
 
-async function PhotoLink({ trip, position, big }) {
+function PhotoLink({ travelersArray, type, big }) {
+  if (!travelersArray.length) return <Spinner />;
   // display photo of the trip's creator of up to 3 photos of trip's travelers
-  let travelersArray = [];
-  if (trip.travelers) {
-    let promiseArray = [];
-    for (let i = 0; i < 3; i++) {
-      if (trip.travelers.at(i))
-        promiseArray.push(getUserInfo(trip.travelers.at(i)));
-    }
-    const travelersInfo = await Promise.all(promiseArray);
-    travelersArray = travelersInfo.map((user) => {
-      return {
-        name: user.user.name,
-        photo: user.user.photo,
-        id: user.user._id,
-      };
-    });
-  } else {
-    // trip creator if no travelers are listed
-    const { user } = await getUserInfo(trip.createdBy);
-    travelersArray.push({ name: user.name, photo: user.photo, id: user._id });
-  }
-
   return (
-    <div className="absolute flex justify-center w-full gap-2 -translate-y-1/2">
-      {travelersArray.map((traveler) => (
+    <div
+      className={`absolute flex w-full gap-2 ${type === 'inTrip' ? '' : '-translate-y-1/2 justify-center'}`}
+    >
+      {travelersArray?.map((traveler) => (
         <div
           className="relative flex flex-col items-center group"
           key={traveler.id}

@@ -106,7 +106,32 @@ export async function getTripInfo(tripId) {
     await connectToDatabase();
     const session = await auth();
     const trip = await Trip.findById(tripId);
-    return { trip, isMyTrip: session?.user?.id === trip?.createdBy };
+
+    let travelersArray = [];
+    if (trip.travelers) {
+      let promiseArray = [];
+      for (let i = 0; i < 3; i++) {
+        if (trip.travelers.at(i))
+          promiseArray.push(getUserInfo(trip.travelers.at(i)));
+      }
+      const travelersInfo = await Promise.all(promiseArray);
+      travelersArray = travelersInfo.map((user) => {
+        return {
+          name: user.user.name,
+          photo: user.user.photo,
+          id: user.user._id,
+        };
+      });
+    } else {
+      // trip creator if no travelers are listed
+      const { user } = await getUserInfo(trip.createdBy);
+      travelersArray.push({ name: user.name, photo: user.photo, id: user._id });
+    }
+    return {
+      trip,
+      travelersArray,
+      isMyTrip: session?.user?.id === trip?.createdBy,
+    };
   } catch (err) {
     console.error('trip info error: ', err.message);
   }

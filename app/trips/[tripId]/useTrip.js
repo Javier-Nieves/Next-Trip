@@ -8,7 +8,11 @@ export function useTrip(tripId) {
     queryFn: async () => {
       const res = await fetch(`/api/trips/${tripId}`);
       const data = await res.json();
-      return { ...data.data.trip, isMyTrip: data.data.isMyTrip };
+      return {
+        ...data.data.trip,
+        isMyTrip: data.data.isMyTrip,
+        travelersArray: data.data.travelersArray,
+      };
     },
   });
 
