@@ -11,14 +11,14 @@ export default async function Navigation() {
   return (
     <nav className="z-50 flex items-center gap-4 text-2xl font-light">
       <ExpandableMenu icon={<FaListUl />} type="nav">
-        <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+        <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
           <Link href="/search" className="w-full text-center">
             Search
           </Link>
         </li>
         {user && (
           <>
-            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
               <Link
                 href={`/collections/${user?.id}`}
                 className="w-full text-center"
@@ -26,12 +26,12 @@ export default async function Navigation() {
                 My trips
               </Link>
             </li>
-            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
               <Link href="/friends" className="w-full text-center">
                 My friends
               </Link>
             </li>
-            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-stone-600 hover:text-black">
+            <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
               <Link href="/add" className="w-full text-center">
                 Add trip
               </Link>

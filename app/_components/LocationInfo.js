@@ -46,7 +46,6 @@ function LocationInfo({ location, setLocationInfo, isMyTrip }) {
         )}
         {images.length > 0 && (
           <p className="flex flex-col items-center w-full gap-3 text-lg">
-            {/* <span className="font-semibold">Images:</span> */}
             <span className={`grid grid-cols-${columns} gap-2`}>
               {images.map((image) => (
                 <img src={image} key={image} />

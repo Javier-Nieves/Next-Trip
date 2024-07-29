@@ -7,9 +7,9 @@ import { useDropzone, type DropzoneOptions } from 'react-dropzone';
 import { twMerge } from 'tailwind-merge';
 
 const variants = {
-  base: 'relative rounded-md aspect-square flex justify-center items-center flex-col cursor-pointer min-h-[50px] min-w-[50px] border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
+  base: 'relative rounded-md aspect-square flex justify-center items-center flex-col cursor-pointer min-w-[50px] max-w-[100px] border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
   image:
-    'border-0 p-0 w-full h-full relative shadow-md bg-slate-200 dark:bg-slate-900 rounded-md',
+    'border-0 p-0 min-w-[50px] max-w-[100px] aspect-square relative shadow-md bg-slate-200 dark:bg-slate-900 rounded-md',
   active: 'border-2',
   disabled:
     'bg-gray-200 border-gray-300 cursor-default pointer-events-none bg-opacity-30 dark:bg-gray-700',

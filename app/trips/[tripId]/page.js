@@ -291,18 +291,13 @@ export default function Page({ params }) {
     setIsEditingSession((cur) => !cur);
     setLocationInfo(null);
   }
-  const { description = '', highlight = '', travelers = [] } = trip || {};
+  // const { description = '', highlight = '', travelers = [] } = trip || {};
 
   return (
     <>
       {(!tripMap.current || isLoading) && <Spinner />}
 
       <div className="fixed top-0 left-0 w-screen h-screen">
-        {/* trip details */}
-        {/* {!isEditingSession && (highlight || description) && (
-          <TripDescription highlight={highlight} description={description} />
-        )} */}
-        {/* add location form */}
         {isEditingSession && Boolean(newLocationCoordinates.length) && (
           <NewLocationForm
             setNewLocationCoordinates={setNewLocationCoordinates}
@@ -324,6 +319,7 @@ export default function Page({ params }) {
             </div>
           )}
 
+          {!isEditingSession && <TripDescription trip={trip} />}
           {trip?.isMyTrip && (
             <TripActionsMenu
               setRegenerateMap={setRegenerateMap}
@@ -332,9 +328,9 @@ export default function Page({ params }) {
             />
           )}
 
-          {travelers?.length !== 0 && (
+          {trip?.travelers?.length !== 0 && (
             <div className="flex gap-2">
-              {travelers.map((traveler) => (
+              {trip?.travelers?.map((traveler) => (
                 <PhotoLink
                   travelersArray={trip?.travelersArray}
                   type="inTrip"
