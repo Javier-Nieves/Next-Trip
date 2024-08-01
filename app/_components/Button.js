@@ -6,7 +6,7 @@ function Button({ children, className, disabled, type, onClick }) {
       'flex justify-center bg-[var(--color-danger)] w-full hover:bg-[var(--color-danger-dark)] hover:text-white rounded-lg';
   if (type === 'bright')
     additionalClass =
-      'bg-[var(--color-orange)] hover:bg-[var(--color-dark-orange)]';
+      'bg-[var(--color-orange)] hover:bg-[var(--color-dark-orange)] rounded-lg';
   if (type === 'menu')
     additionalClass =
       'w-full flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black hover:text-black';

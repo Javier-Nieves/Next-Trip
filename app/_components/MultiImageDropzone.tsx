@@ -148,7 +148,8 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div>
         <div
-          className={`grid grid-cols-${dropzoneOptions?.maxFiles === 1 ? '1' : '3'} gap-1`}
+          className={`grid grid-cols-3 gap-1`}
+          // className={`grid grid-cols-${dropzoneOptions?.maxFiles === 1 ? '1' : '3'} gap-1`}
         >
           {/* Images */}
           {value?.map(({ file, progress }, index) => (

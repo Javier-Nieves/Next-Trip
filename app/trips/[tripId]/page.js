@@ -319,7 +319,9 @@ export default function Page({ params }) {
             </div>
           )}
 
-          {!isEditingSession && <TripDescription trip={trip} />}
+          {(!isEditingSession || tripMap.current || !isLoading) && (
+            <TripDescription trip={trip} setLocationInfo={setLocationInfo} />
+          )}
           {trip?.isMyTrip && (
             <TripActionsMenu
               setRegenerateMap={setRegenerateMap}
