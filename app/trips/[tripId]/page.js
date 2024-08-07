@@ -319,7 +319,7 @@ export default function Page({ params }) {
             </div>
           )}
 
-          {(!isEditingSession || tripMap.current || !isLoading) && (
+          {!isEditingSession && tripMap.current && !isLoading && (
             <TripDescription trip={trip} setLocationInfo={setLocationInfo} />
           )}
           {trip?.isMyTrip && (

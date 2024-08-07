@@ -12,7 +12,6 @@ function Backdrop({ children, onClick, photoFocused, photos }) {
     }
   };
 
-  console.log('\x1b[36m%s\x1b[0m', 'activePhoto', activePhoto, photos.length);
   const handleInc = () => {
     if (activePhoto + 1 < photos.length) {
       setActivePhoto((cur) => cur + 1);
@@ -39,15 +38,17 @@ function Backdrop({ children, onClick, photoFocused, photos }) {
               <FaAngleLeft />
             </div>
 
-            <div className="relative min-w-[50%] md:h-2/3" onClick={onClick}>
+            <div
+              className="relative w-4/5 min-h-[75%] max-h-[90%]"
+              onClick={onClick}
+            >
               <Image
                 src={photos.at(activePhoto)}
                 alt="Selected location Image"
                 fill
                 placeholder="blur"
                 blurDataURL={`/_next/image?url=${photos.at(activePhoto)}&w=16&q=1`}
-                sizes="300px"
-                className="object-cover w-full h-full"
+                className="absolute inset-0 object-contain h-full"
               />
             </div>
 

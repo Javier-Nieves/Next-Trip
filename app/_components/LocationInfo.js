@@ -9,18 +9,7 @@ function LocationInfo({ location, setLocationInfo, isMyTrip }) {
   const { removeLocation } = useRemoveLocation();
   const [photoFocused, setPhotoFocused] = useState(null);
   const images = JSON.parse(location.images);
-  let columns;
-  switch (images.length) {
-    case 1:
-      columns = 1;
-      break;
-    case 2:
-    case 4:
-      columns = 2;
-      break;
-    default:
-      columns = 3;
-  }
+
   async function handleDeleteLocation(name) {
     removeLocation(name);
     setLocationInfo(null);
@@ -49,20 +38,22 @@ function LocationInfo({ location, setLocationInfo, isMyTrip }) {
           </p>
         )}
         {images.length > 0 && (
-          <div className="flex flex-col items-center w-full gap-3 text-lg">
-            <span className={`grid grid-cols-${columns} gap-2 w-full`}>
+          <div className="flex flex-col items-center gap-3 text-lg">
+            <span className="flex flex-wrap justify-center w-full gap-2">
               {images.map((image) => (
                 <div
                   key={image}
-                  className="relative h-[100px] hover:cursor-pointer"
+                  className="relative flex-shrink-0 h-full hover:cursor-pointer"
                   onClick={() => setPhotoFocused(image)}
                 >
                   <Image
                     src={image}
-                    fill
+                    // fill
                     placeholder="blur"
+                    height={100}
+                    width={100}
                     blurDataURL={`/_next/image?url=${image}&w=16&q=1`}
-                    className="object-cover"
+                    className="object-contain h-full"
                     alt="Location picture"
                   />
                 </div>
