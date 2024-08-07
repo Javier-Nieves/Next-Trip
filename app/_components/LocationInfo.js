@@ -1,8 +1,8 @@
-import Button from '@/app/_components/Button';
 import { FaPencilAlt, FaTrashAlt } from 'react-icons/fa';
-import { useRemoveLocation } from '@/app/trips/[tripId]/useRemoveLocation';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useRemoveLocation } from '@/app/trips/[tripId]/useRemoveLocation';
+import Button from '@/app/_components/Button';
 import Backdrop from './Backdrop';
 
 function LocationInfo({ location, setLocationInfo, isMyTrip }) {

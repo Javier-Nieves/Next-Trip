@@ -104,7 +104,6 @@ export default function Page() {
       onSubmit={handleSubmit(onSubmit)}
       className="flex flex-col items-center justify-center w-full mx-auto md:w-1/2"
     >
-      {/* <h1 className="p-1 text-4xl">Create trip</h1> */}
       <div className="flex items-center">
         <div className="w-3/4">
           <input
@@ -182,16 +181,3 @@ export default function Page() {
     </form>
   );
 }
-
-// {
-//   _id: new ObjectId('652c74f6d5f82888a6b7aee8'),
-//   name: 'Big Colombia Trip',
-//   travelers: [ [Object], [Object] ],
-// todo  description: 'test',
-//   createdBy: '66795378a059a9fb42c4ec22',
-//   date: 2020-07-23T00:00:00.000Z,
-//   highlight: 'Across all country in a car',
-//   private: false,
-//   duration: '3 weeks',
-//   coverImage: 'trip-65444d163218278ffd2104f2-1699660062616.jpeg'
-// }

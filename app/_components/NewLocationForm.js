@@ -90,11 +90,13 @@ function NewLocationForm({
 
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Images: </span>
-          <MultiImageDropzoneUsage
-            maxFiles={6}
-            setUploadedImages={setUploadedImages}
-            setIsLoading={setIsLoading}
-          />
+          <span className="width-[50px]">
+            <MultiImageDropzoneUsage
+              maxFiles={6}
+              setUploadedImages={setUploadedImages}
+              setIsLoading={setIsLoading}
+            />
+          </span>
         </div>
 
         <button

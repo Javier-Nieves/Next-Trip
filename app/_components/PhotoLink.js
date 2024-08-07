@@ -3,11 +3,12 @@ import travelerImage from '../../public/user.png';
 import Spinner from './Spinner';
 
 function PhotoLink({ travelersArray, type, big }) {
-  if (!travelersArray.length) return <Spinner />;
+  // type can be 'inTrip' - on trip page, 'desc' - in trip description, 'card' - on the tripCard
+
   // display photo of the trip's creator of up to 3 photos of trip's travelers
   return (
     <div
-      className={`absolute flex gap-2 ${type === 'inTrip' ? '' : 'w-full -translate-y-1/2 justify-center'}`}
+      className={`${type !== 'desc ? absolute : block'} flex gap-2 ${type === 'card' ? 'w-full -translate-y-1/2 justify-center' : ''}`}
     >
       {travelersArray?.map((traveler) => (
         <div
@@ -15,7 +16,7 @@ function PhotoLink({ travelersArray, type, big }) {
           key={traveler.id}
         >
           <div
-            className={` z-50 overflow-hidden duration-300 ease-in-out transform  border-4 border-white rounded-full ${big ? 'w-[4rem]' : 'w-[3.2rem]'} hover:cursor-pointer hover:scale-105 aspect-square`}
+            className={`z-50 overflow-hidden duration-300 ease-in-out transform  border-4 border-white rounded-full ${big ? 'w-[4rem]' : 'w-[3.2rem]'} hover:cursor-pointer hover:scale-105 aspect-square`}
           >
             <Link href={`/collections/${traveler.id}`}>
               <img

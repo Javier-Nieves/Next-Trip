@@ -330,15 +330,9 @@ export default function Page({ params }) {
             />
           )}
 
-          {trip?.travelers?.length !== 0 && (
+          {trip?.travelersArray?.length !== 0 && (
             <div className="flex gap-2">
-              {trip?.travelers?.map((traveler) => (
-                <PhotoLink
-                  travelersArray={trip?.travelersArray}
-                  type="inTrip"
-                  key={traveler._id}
-                />
-              ))}
+              <PhotoLink travelersArray={trip?.travelersArray} type="inTrip" />
             </div>
           )}
         </div>

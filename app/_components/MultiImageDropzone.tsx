@@ -7,7 +7,7 @@ import { useDropzone, type DropzoneOptions } from 'react-dropzone';
 import { twMerge } from 'tailwind-merge';
 
 const variants = {
-  base: 'relative rounded-md aspect-square flex justify-center items-center flex-col cursor-pointer min-w-[50px] max-w-[100px] border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
+  base: 'relative rounded-md aspect-square flex justify-center items-center flex-col cursor-pointer  border border-dashed border-gray-400 dark:border-gray-300 transition-colors duration-200 ease-in-out',
   image:
     'border-0 p-0 min-w-[50px] max-w-[100px] aspect-square relative shadow-md bg-slate-200 dark:bg-slate-900 rounded-md',
   active: 'border-2',
@@ -148,8 +148,8 @@ const MultiImageDropzone = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div>
         <div
-          className={`grid grid-cols-3 gap-1`}
-          // className={`grid grid-cols-${dropzoneOptions?.maxFiles === 1 ? '1' : '3'} gap-1`}
+          // className={`grid grid-cols-3 gap-1`}
+          className={`grid grid-cols-${dropzoneOptions?.maxFiles === 1 ? '1' : '3'} gap-1`}
         >
           {/* Images */}
           {value?.map(({ file, progress }, index) => (

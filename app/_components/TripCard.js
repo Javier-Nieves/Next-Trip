@@ -47,7 +47,7 @@ async function TripCard({ trip, cardNumber }) {
       </Link>
 
       <PhotoLink
-        // user={user}
+        type="card"
         travelersArray={travelersArray}
         big={isBigCard}
         position={
