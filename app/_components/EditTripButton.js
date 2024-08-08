@@ -1,13 +1,15 @@
-import Button from '@/app/_components/Button';
+import Link from 'next/link';
 import { FaPencilAlt } from 'react-icons/fa';
+import Button from '@/app/_components/Button';
 
-function EditTripButton() {
+function EditTripButton({ id }) {
   return (
     <Button type="menu">
-      <>
-        <FaPencilAlt />
-        Edit trip
-      </>
+      <Link href={`/edit/${id}`}>
+        <span className="flex items-center gap-1">
+          <FaPencilAlt /> Edit trip
+        </span>
+      </Link>
     </Button>
   );
 }

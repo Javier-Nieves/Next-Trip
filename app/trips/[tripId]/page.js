@@ -324,6 +324,7 @@ export default function Page({ params }) {
           )}
           {trip?.isMyTrip && (
             <TripActionsMenu
+              id={trip._id}
               setRegenerateMap={setRegenerateMap}
               handleAddLocation={handleAddLocation}
               isEditingSession={isEditingSession}

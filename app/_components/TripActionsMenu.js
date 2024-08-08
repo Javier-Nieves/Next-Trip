@@ -4,7 +4,7 @@ import EditTripButton from '@/app/_components/EditTripButton';
 import ExpandableMenu from './ExpandableMenu';
 import { FaBars } from 'react-icons/fa';
 
-function TripActionsMenu({ handleAddLocation, isEditingSession }) {
+function TripActionsMenu({ handleAddLocation, isEditingSession, id }) {
   return (
     <ExpandableMenu
       icon={
@@ -19,7 +19,7 @@ function TripActionsMenu({ handleAddLocation, isEditingSession }) {
         isEditingSession={isEditingSession}
         type="menu"
       />
-      <EditTripButton />
+      <EditTripButton id={id} />
       <DeleteTripButton />
     </ExpandableMenu>
   );

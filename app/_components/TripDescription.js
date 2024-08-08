@@ -4,6 +4,7 @@ import Button from './Button';
 import Backdrop from './Backdrop';
 import PhotoLink from './PhotoLink';
 import { format } from 'date-fns';
+import Link from 'next/link';
 
 function TripDescription({ trip, setLocationInfo }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -15,10 +16,7 @@ function TripDescription({ trip, setLocationInfo }) {
 
   return (
     <>
-      <Button
-        onClick={handleClick}
-        // className="z-50 rounded-full"
-      >
+      <Button onClick={handleClick}>
         <FaInfo /> Trip Details
       </Button>
 
@@ -70,7 +68,11 @@ function TripDescription({ trip, setLocationInfo }) {
             )}
 
             <Button type="bright">
-              <FaPencilAlt /> Edit trip
+              <Link href={`/edit/${trip._id}`}>
+                <span className="flex items-center gap-1">
+                  <FaPencilAlt /> Edit trip
+                </span>
+              </Link>
             </Button>
           </div>
         </Backdrop>

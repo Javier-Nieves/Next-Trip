@@ -1,4 +1,4 @@
-function SmallToggle({ children, register }) {
+function SmallToggle({ children, register, checked = false }) {
   return (
     <div className="flex items-center justify-center w-1/4">
       <label className="flex flex-col items-center gap-4 cursor-pointer sm:flex-row justity-center">
@@ -8,6 +8,7 @@ function SmallToggle({ children, register }) {
         <div>
           <input
             type="checkbox"
+            defaultChecked={checked}
             className="sr-only peer"
             {...register('private')}
           />

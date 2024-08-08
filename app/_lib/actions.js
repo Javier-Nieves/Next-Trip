@@ -32,6 +32,20 @@ export async function createTrip(data) {
   redirect(`/trips/${newTrip._id}`);
 }
 
+export async function editTrip(data) {
+  const tripId = await getTripId();
+  if (!tripId) throw new Error('Can not modify this!');
+
+  await connectToDatabase();
+  // prettier-ignore
+  const filteredBody = filterData({...data}, 'name', 'date', 'travelers', 'duration',
+    'highlight', 'description', 'private', 'coverImage');
+  console.log('\x1b[36m%s\x1b[0m', 'tripId', tripId);
+  const modifiedTrip = await Trip.findByIdAndUpdate(tripId, filteredBody);
+  revalidatePath(`/`);
+  redirect(`/trips/${modifiedTrip._id}`);
+}
+
 export async function addLocationToTrip(data) {
   try {
     const tripId = await getTripId();
@@ -129,7 +143,8 @@ async function getTripId() {
     await connectToDatabase();
     const trip = await Trip.findById(tripId);
     const session = await auth();
-    if (!trip?.createdBy === session.user.id) return;
+    console.log('checking creation: ', trip?.createdBy, session.user.id);
+    if (trip?.createdBy !== session.user.id) return;
 
     return tripId;
   } catch (err) {
