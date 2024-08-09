@@ -40,7 +40,7 @@ export async function editTrip(data) {
   // prettier-ignore
   const filteredBody = filterData({...data}, 'name', 'date', 'travelers', 'duration',
     'highlight', 'description', 'private', 'coverImage');
-  console.log('\x1b[36m%s\x1b[0m', 'tripId', tripId);
+  // console.log('\x1b[36m%s\x1b[0m', 'tripId', tripId);
   const modifiedTrip = await Trip.findByIdAndUpdate(tripId, filteredBody);
   revalidatePath(`/`);
   redirect(`/trips/${modifiedTrip._id}`);

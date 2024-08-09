@@ -67,13 +67,15 @@ function TripDescription({ trip, setLocationInfo }) {
               </span>
             )}
 
-            <Button type="bright">
-              <Link href={`/edit/${trip._id}`}>
-                <span className="flex items-center gap-1">
-                  <FaPencilAlt /> Edit trip
-                </span>
-              </Link>
-            </Button>
+            {trip.isMyTrip && (
+              <Button type="bright">
+                <Link href={`/edit/${trip._id}`}>
+                  <span className="flex items-center gap-1">
+                    <FaPencilAlt /> Edit trip
+                  </span>
+                </Link>
+              </Button>
+            )}
           </div>
         </Backdrop>
       )}

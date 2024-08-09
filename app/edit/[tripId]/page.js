@@ -6,8 +6,10 @@ import { add } from 'date-fns';
 import { enGB } from 'date-fns/locale';
 import { differenceInDays } from 'date-fns';
 import { DayPicker } from 'react-day-picker';
+import { useQueryClient } from '@tanstack/react-query';
 import { FaArrowLeft, FaSave } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import Link from 'next/link';
 import { editTrip } from '@/app/_lib/actions';
 import { MultiImageDropzoneUsage } from '@/app/_components/MultiImageDropzoneUsage';
 import SmallToggle from '@/app/_components/SmallToggle';
@@ -16,10 +18,10 @@ import TravelersList from '@/app/_components/TravelersList';
 
 import 'react-day-picker/dist/style.css';
 import { useTrip } from '@/app/trips/[tripId]/useTrip';
-import Link from 'next/link';
 
 export default function Page({ params }) {
   // todo - only creator can access this page
+  const queryClient = useQueryClient();
   const { trip, isLoading: tripLoading } = useTrip(params.tripId);
   // todo - useReducer useRef?
   const initialRange = { from: undefined, to: undefined };
@@ -85,8 +87,9 @@ export default function Page({ params }) {
         duration,
         coverImage,
       };
-      console.log('new info', completeData);
+      // console.log('new info', completeData);
       await editTrip(completeData);
+      clearQueryData();
       toast.success('🏞️ Trip info is edited!');
       // clear form
       reset();
@@ -96,6 +99,12 @@ export default function Page({ params }) {
       toast.error(err.message);
     }
   }
+
+  const clearQueryData = () => {
+    queryClient.removeQueries({
+      predicate: () => true,
+    });
+  };
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -208,7 +217,7 @@ export default function Page({ params }) {
           className="bg-gray-400 rounded-lg"
         >
           <Link href={`/trips/${trip?._id}`}>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1" onClick={clearQueryData}>
               <FaArrowLeft /> Back to the trip
             </span>
           </Link>

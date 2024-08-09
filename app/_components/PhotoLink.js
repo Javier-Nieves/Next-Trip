@@ -8,7 +8,7 @@ function PhotoLink({ travelersArray, type, big }) {
   // display photo of the trip's creator of up to 3 photos of trip's travelers
   return (
     <div
-      className={`${type !== 'desc ? absolute : block'} flex gap-2 ${type === 'card' ? 'w-full -translate-y-1/2 justify-center' : ''}`}
+      className={`${type !== 'desc' ? 'absolute' : 'block'} flex gap-2 ${type === 'card' ? 'w-full -translate-y-1/2 justify-center' : ''}`}
     >
       {travelersArray?.map((traveler) => (
         <div
