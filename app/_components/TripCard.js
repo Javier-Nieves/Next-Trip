@@ -17,7 +17,7 @@ async function TripCard({ trip, cardNumber }) {
     <div
       className={`${
         isBigCard ? 'w-full' : 'md:w-4/5 md:mx-auto'
-      } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-[var(--color-orange)] outline-offset-4' : ''} ${isMe ? 'outline outline-[var(--color-green)]  outline-offset-4' : ''} hover:scale-[1.01] hover:cursor-pointer`}
+      } bg-white shadow-lg ease-in-out duration-300 rounded-lg overflow-hidden aspect-[2/3] relative ${isFriend ? 'outline outline-[var(--color-orange)] outline-offset-4' : ''} ${isMe ? 'outline outline-[var(--color-green)]  outline-offset-4' : ''} hover:scale-[1.01] hover:cursor-pointer max-w-[300px]`}
     >
       {(isFriend || isMe) && (
         <div

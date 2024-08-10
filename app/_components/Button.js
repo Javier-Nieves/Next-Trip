@@ -9,7 +9,13 @@ function Button({ children, className, disabled, type, onClick }) {
       'bg-[var(--color-orange)] hover:bg-[var(--color-dark-orange)] rounded-lg';
   if (type === 'menu')
     additionalClass =
-      'w-full flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black hover:text-black';
+      'w-full flex justify-center p-2 hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black hover:text-black';
+  if (type === 'small')
+    additionalClass =
+      '!text-sm bg-[var(--color-orange)] hover:bg-[var(--color-dark-orange)] rounded-lg !p-2';
+  if (type === 'smallDelete')
+    additionalClass =
+      '!text-sm bg-[var(--color-danger)] hover:bg-[var(--color-danger-dark)] hover:text-white rounded-lg !p-2';
 
   return (
     <button

@@ -28,7 +28,7 @@ function ExpandableMenu({ children, icon, type }) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={toggleMenu}
-        className={`flex w-full justify-center items-center gap-2 text-xl ${type === 'nav' ? 'h-12 aspect-square' : ''}font-semibold p-3 bg-[var(--color-orange)] hover:bg-[var(--color-grey-tr-7)] text-black rounded-full focus:outline-none shadow-lg`}
+        className={`flex w-full justify-center items-center gap-2 text-xl ${type === 'nav' ? 'h-12 aspect-square' : ''} font-semibold p-3 bg-[var(--color-orange)] hover:bg-[var(--color-grey-tr-7)] text-black rounded-full focus:outline-none shadow-lg`}
       >
         {icon}
       </button>
