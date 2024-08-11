@@ -129,6 +129,10 @@ export async function deleteTrip() {
   }
 }
 
+export async function addFriend(id) {
+  console.log('\x1b[36m%s\x1b[0m', 'adding friend', id);
+}
+
 export async function navigate(url = '/') {
   redirect(url);
 }

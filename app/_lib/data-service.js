@@ -90,14 +90,18 @@ export async function getFriendsInfo() {
   try {
     await connectToDatabase();
     const session = await auth();
-    const user = await User.findById(session.user.id);
-    // todo ? await User.findById(session.user.id).populate({ path: 'friends' });
-    const friendIds = user.friends.map((user) => user.toString());
-    const friends = await Promise.all(friendIds.map((id) => User.findById(id)));
+    const user = await User.findById(session.user.id)
+      .populate('friends')
+      .populate('friendRequests')
+      .exec();
+    // const friends = user.friends;
+    // const friendRequests = user.friendRequests;
     // console.log('friends', friends);
-    return { user, userId: session.user.id, friends };
+    // console.log('friendReqs', friendRequests);
+    return { user, userId: session.user.id };
   } catch (err) {
     console.error(err.message);
+    throw new Error('Friends can not be found for the user');
   }
 }
 

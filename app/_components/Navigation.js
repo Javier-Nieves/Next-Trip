@@ -1,8 +1,15 @@
 import Link from 'next/link';
-import { FaListUl } from 'react-icons/fa';
+import {
+  FaListUl,
+  FaSearchengin,
+  FaGlobeAmericas,
+  FaMapMarkedAlt,
+  FaUserFriends,
+} from 'react-icons/fa';
 import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
 import ExpandableMenu from './ExpandableMenu';
+import {} from 'react-icons/fa';
 
 export default async function Navigation() {
   const session = await auth();
@@ -12,8 +19,11 @@ export default async function Navigation() {
     <nav className="z-50 flex items-center gap-4 text-2xl font-light">
       <ExpandableMenu icon={<FaListUl />} type="nav">
         <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
-          <Link href="/search" className="w-full text-center">
-            Search
+          <Link
+            href="/search"
+            className="flex items-center justify-center w-full gap-2"
+          >
+            <FaSearchengin /> Search
           </Link>
         </li>
         {user && (
@@ -21,19 +31,25 @@ export default async function Navigation() {
             <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
               <Link
                 href={`/collections/${user?.id}`}
-                className="w-full text-center"
+                className="flex items-center justify-center w-full gap-2"
               >
-                My trips
+                <FaGlobeAmericas /> My trips
               </Link>
             </li>
             <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
-              <Link href="/friends" className="w-full text-center">
-                My friends
+              <Link
+                href="/friends"
+                className="flex items-center justify-center w-full gap-2"
+              >
+                <FaUserFriends /> My friends
               </Link>
             </li>
             <li className="flex justify-center p-2 cursor-pointer hover:bg-[var(--color-grey-tr-7)] hover:rounded-lg font-medium text-black">
-              <Link href="/add" className="w-full text-center">
-                Add trip
+              <Link
+                href="/add"
+                className="flex items-center justify-center w-full gap-2"
+              >
+                <FaMapMarkedAlt /> Add trip
               </Link>
             </li>
           </>
