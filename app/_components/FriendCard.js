@@ -5,27 +5,32 @@ import {
   FaRegCheckCircle,
   FaRegTrashAlt,
 } from 'react-icons/fa';
-// import { addFriend } from '../_lib/actions';
+import { useAddFriend } from '@/app/friends/useAddFriend';
+import { useDeclineRequest } from '@/app/friends/useDeclineRequest';
 
 function FriendCard({ friend, type }) {
   // type can be 'friend' or 'request'
+  const { addFriend, isLoading: isAdding } = useAddFriend();
+  const { declineRequest, isLoading: isDeclining } = useDeclineRequest();
+  const isWorking = isAdding || isDeclining;
 
-  async function handleAddFriend() {
-    // await addFriend(friend._id);
-    console.log('\x1b[36m%s\x1b[0m', 'handler');
+  async function handleAddFriend(e) {
+    e.preventDefault();
+    addFriend(friend._id);
+  }
+  async function handleDecline(e) {
+    e.preventDefault();
+    declineRequest(friend._id);
   }
 
   return (
     <Link href={`/collections/${String(friend._id)}`}>
       <li
-        className={`relative flex items-center w-3/4 p-2 mx-auto border rounded-md shadow-md lg:w-4/5 border-stone-500 transition-all duration-300 hover:cursor-pointer hover:scale-[1.01] ${type === 'request' ? 'justify-between' : 'justify-center'}`}
+        className={`relative flex items-center w-1/2 p-2 mx-auto border rounded-md shadow-md border-stone-500 transition-all duration-300 hover:cursor-pointer hover:scale-[1.01] ${type === 'request' ? 'justify-between' : 'justify-center'}`}
       >
         {type === 'request' && (
-          <div
-            className="mx-4 text-4xl text-red-500 hover:text-red-700"
-            // onClick={handleAddFriend}
-          >
-            <button type="submit">
+          <div className="mx-4 text-4xl text-red-500 hover:text-red-700">
+            <button onClick={handleDecline} disabled={isWorking}>
               <FaRegTimesCircle />
             </button>
           </div>
@@ -43,13 +48,16 @@ function FriendCard({ friend, type }) {
           <Button
             type="smallDelete"
             className="absolute bottom-0 right-0 m-1 rounded-md"
+            disabled={isWorking}
           >
             <FaRegTrashAlt />
           </Button>
         )}
         {type === 'request' && (
           <div className="mx-4 text-4xl text-green-500 hover:text-green-700">
-            <FaRegCheckCircle />
+            <button onClick={handleAddFriend} disabled={isWorking}>
+              <FaRegCheckCircle />
+            </button>
           </div>
         )}
       </li>

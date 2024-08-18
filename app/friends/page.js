@@ -14,7 +14,7 @@ export default function Page() {
 
   return (
     <section className="flex gap-4">
-      <div className="flex flex-col items-center justify-center w-3/4 h-full">
+      <div className="flex flex-col items-center justify-center w-full h-full">
         <h1 className="p-4 text-3xl">My friends</h1>
         {user?.friends.length ? (
           <ul className={`grid w-full gap-3 lg:grid-cols-${friendColumns}`}>

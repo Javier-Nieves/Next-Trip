@@ -131,6 +131,38 @@ export async function deleteTrip() {
 
 export async function addFriend(id) {
   console.log('\x1b[36m%s\x1b[0m', 'adding friend', id);
+  try {
+    await connectToDatabase();
+    const session = await auth();
+    const user = await User.findById(session.user.id);
+    if (!user.friendRequests.includes(id) || user.friends.includes(id)) return;
+
+    // mutual friendship adding:
+    const userPromise = User.findByIdAndUpdate(
+      session.user.id,
+      {
+        $addToSet: { friends: id }, // Add id to the friends array if it's not already present
+        $pull: { friendRequests: id }, // Remove id from the friendRequests array
+      },
+      { new: true },
+    );
+
+    const newFriendPromise = await User.findByIdAndUpdate(id, {
+      $addToSet: { friends: session.user.id },
+    });
+
+    await Promise.all([userPromise, newFriendPromise]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export async function declineRequest(id) {
+  console.log('\x1b[36m%s\x1b[0m', 'declining friend', id);
+  try {
+  } catch (err) {
+    throw new Error(err.message);
+  }
 }
 
 export async function navigate(url = '/') {
@@ -147,7 +179,7 @@ async function getTripId() {
     await connectToDatabase();
     const trip = await Trip.findById(tripId);
     const session = await auth();
-    console.log('checking creation: ', trip?.createdBy, session.user.id);
+    // console.log('checking creation: ', trip?.createdBy, session.user.id);
     if (trip?.createdBy !== session.user.id) return;
 
     return tripId;
