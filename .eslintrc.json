@@ -1,12 +1,11 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es2021": true,
     "node": true
   },
   "extends": [
-    "airbnb",
-    "airbnb/hooks",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "next/core-web-vitals"

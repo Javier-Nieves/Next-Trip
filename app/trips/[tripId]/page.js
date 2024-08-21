@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import mapboxgl from '!mapbox-gl';
@@ -51,7 +51,7 @@ export default function Page({ params }) {
       }
     }
     getTripMap();
-  }, [result, trip]);
+  }, [mapIsCreated, result, trip]);
 
   // 1.5) change app name to trip name and back
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function Page({ params }) {
       const title = document.querySelector('.mainTitle');
       if (title) title.innerHTML = 'See the World';
     };
-  }, [trip]);
+  }, [queryClient, trip]);
 
   //! 2) invalidate map query when map is regenerated (after editing)
   useEffect(() => {
@@ -77,7 +77,7 @@ export default function Page({ params }) {
       setMapIsCreated(false);
       setRegenerateMap(() => false);
     }
-  }, [mapContainer.current, regenerateMap]);
+  }, [queryClient, regenerateMap]);
 
   //! 3) convert map to editing if needed
   useEffect(() => {
@@ -108,7 +108,7 @@ export default function Page({ params }) {
       }
     }
     convertToEditing();
-  }, [isEditingSession, tripMap.current]);
+  }, [isEditingSession]);
 
   //! 4) filling arrays
   useEffect(() => {
@@ -125,7 +125,7 @@ export default function Page({ params }) {
           duration: 3000,
         });
     }
-  }, [trip, tripMap.current, mapIsCreated]);
+  }, [trip, mapIsCreated, isEditingSession]);
 
   //! 5) creating locations layer
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function Page({ params }) {
       createLocationsLayer();
       populatePopups();
     }
-  }, [trip, features.current, mapIsCreated, tripMap.current]);
+  }, [trip, mapIsCreated, createLocationsLayer]);
 
   //! 6) getting GeoJSON data for location points
   useEffect(() => {
@@ -155,7 +155,7 @@ export default function Page({ params }) {
       drawRoute(routeData);
     }
     plotPath();
-  }, [waypoints.current, isHike, tripMap.current, trip]);
+  }, [isHike, trip]);
 
   function fillGeoArrays(locations, bounds) {
     if (!locations?.length) return;
@@ -180,20 +180,24 @@ export default function Page({ params }) {
     waypoints.current = newWaypoints;
     features.current = newFeatures;
   }
-  function createLocationsLayer() {
-    // updating layer's source if new feature is added
-    if (tripMap.current?.getSource('locations')) {
-      tripMap.current.getSource('locations').setData({
-        type: 'FeatureCollection',
-        features: features.current,
+  const createLocationsLayer = useCallback(
+    function createLocationsLayer() {
+      // updating layer's source if new feature is added
+      if (tripMap.current?.getSource('locations')) {
+        tripMap.current.getSource('locations').setData({
+          type: 'FeatureCollection',
+          features: features.current,
+        });
+      }
+      if (typeof tripMap.current === 'object' && isEditingSession)
+        handleLocationLayer();
+      tripMap.current?.on('load', () => {
+        handleLocationLayer();
       });
-    }
-    if (typeof tripMap.current === 'object' && isEditingSession)
-      handleLocationLayer();
-    tripMap.current?.on('load', () => {
-      handleLocationLayer();
-    });
-  }
+    },
+    [isEditingSession],
+  );
+
   function handleLocationLayer() {
     // console.log('\x1b[36m%s\x1b[0m', 'map', tripMap.current);
     // creating source for the Locations layer

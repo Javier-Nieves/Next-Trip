@@ -73,7 +73,7 @@ export default function Page({ params }) {
       });
       setIsLoading(tripLoading);
     },
-    [trip],
+    [trip, tripLoading],
   );
 
   async function onSubmit(data) {
