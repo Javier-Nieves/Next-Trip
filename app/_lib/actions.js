@@ -152,6 +152,7 @@ export async function addFriend(id) {
     });
 
     await Promise.all([userPromise, newFriendPromise]);
+    revalidatePath(`/`);
   } catch (err) {
     throw new Error(err.message);
   }
@@ -180,6 +181,7 @@ export async function deleteFriend(id) {
     });
 
     await Promise.all([userPromise, friendPromise]);
+    revalidatePath(`/`);
   } catch (err) {
     throw new Error(err.message);
   }

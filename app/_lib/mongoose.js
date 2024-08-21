@@ -4,10 +4,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) throw new Error('Mongoose can not be connected');
 
-const DB = process.env.MONGODB_URI.replace(
-  '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-);
+const DB = MONGODB_URI.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 
 const connectToDatabase = async () => {
   try {

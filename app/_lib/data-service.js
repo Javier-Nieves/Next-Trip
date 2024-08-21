@@ -29,7 +29,9 @@ export async function getPublicTrips() {
     return trips;
   } catch (err) {
     console.error(err.message);
-    throw new Error('Something went wrong. Could not get trips.');
+    throw new Error(
+      `Something went wrong. Could not get trips. ${err.message}`,
+    );
   }
 }
 
@@ -101,7 +103,7 @@ export async function getFriendsInfo() {
     return { user, userId: session.user.id };
   } catch (err) {
     console.error(err.message);
-    throw new Error('Friends can not be found for the user');
+    throw new Error(`Friends can not be found for the user. ${err.message}`);
   }
 }
 
