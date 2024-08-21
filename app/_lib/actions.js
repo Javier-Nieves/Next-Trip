@@ -158,8 +158,20 @@ export async function addFriend(id) {
 }
 
 export async function declineRequest(id) {
-  console.log('\x1b[36m%s\x1b[0m', 'declining friend', id);
+  // console.log('\x1b[36m%s\x1b[0m', 'declining friend', id);
   try {
+    await connectToDatabase();
+    const session = await auth();
+    const user = await User.findById(session.user.id);
+
+    if (!user.friendRequests.includes(id)) return;
+    await User.findByIdAndUpdate(
+      session.user.id,
+      {
+        $pull: { friendRequests: id },
+      },
+      { new: true },
+    );
   } catch (err) {
     throw new Error(err.message);
   }
