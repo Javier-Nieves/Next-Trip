@@ -6,13 +6,15 @@ import {
   FaRegTrashAlt,
 } from 'react-icons/fa';
 import { useAddFriend } from '@/app/friends/useAddFriend';
+import { useDeleteFriend } from '@/app/friends/useDeleteFriend';
 import { useDeclineRequest } from '@/app/friends/useDeclineRequest';
 
 function FriendCard({ friend, type }) {
   // type can be 'friend' or 'request'
   const { addFriend, isLoading: isAdding } = useAddFriend();
+  const { deleteFriend, isLoading: isDeleting } = useDeleteFriend();
   const { declineRequest, isLoading: isDeclining } = useDeclineRequest();
-  const isWorking = isAdding || isDeclining;
+  const isWorking = isAdding || isDeclining || isDeleting;
 
   async function handleAddFriend(e) {
     e.preventDefault();
@@ -21,6 +23,10 @@ function FriendCard({ friend, type }) {
   async function handleDecline(e) {
     e.preventDefault();
     declineRequest(friend._id);
+  }
+  async function handleDeleteFriend(e) {
+    e.preventDefault();
+    deleteFriend(friend._id);
   }
 
   return (
@@ -49,6 +55,7 @@ function FriendCard({ friend, type }) {
             type="smallDelete"
             className="absolute bottom-0 right-0 m-1 rounded-md"
             disabled={isWorking}
+            onClick={handleDeleteFriend}
           >
             <FaRegTrashAlt />
           </Button>

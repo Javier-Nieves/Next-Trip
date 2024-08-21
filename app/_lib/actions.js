@@ -130,7 +130,7 @@ export async function deleteTrip() {
 }
 
 export async function addFriend(id) {
-  console.log('\x1b[36m%s\x1b[0m', 'adding friend', id);
+  // console.log('\x1b[36m%s\x1b[0m', 'adding friend', id);
   try {
     await connectToDatabase();
     const session = await auth();
@@ -152,6 +152,34 @@ export async function addFriend(id) {
     });
 
     await Promise.all([userPromise, newFriendPromise]);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export async function deleteFriend(id) {
+  try {
+    await connectToDatabase();
+    const session = await auth();
+    const user = await User.findById(session.user.id);
+    if (!user.friends.includes(id)) return;
+
+    // friend is put into friend requests category:
+    const userPromise = User.findByIdAndUpdate(
+      session.user.id,
+      {
+        $pull: { friends: id },
+        $addToSet: { friendRequests: id },
+      },
+      { new: true },
+    );
+
+    // remove logged user user from friends
+    const friendPromise = await User.findByIdAndUpdate(id, {
+      $pull: { friends: session.user.id },
+    });
+
+    await Promise.all([userPromise, friendPromise]);
   } catch (err) {
     throw new Error(err.message);
   }
