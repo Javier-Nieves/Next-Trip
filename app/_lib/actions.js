@@ -2,7 +2,6 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import { headers } from 'next/headers';
 
 import Trip from '../models/tripModel';
 import Location from '../models/locationModel';
@@ -32,8 +31,7 @@ export async function createTrip(data) {
   redirect(`/trips/${newTrip._id}`);
 }
 
-export async function editTrip(data) {
-  const tripId = await getTripId();
+export async function editTrip(tripId, data) {
   if (!tripId) throw new Error('Can not modify this!');
 
   await connectToDatabase();
@@ -46,9 +44,8 @@ export async function editTrip(data) {
   redirect(`/trips/${modifiedTrip._id}`);
 }
 
-export async function addLocationToTrip(data) {
+export async function addLocationToTrip(tripId, data) {
   try {
-    const tripId = await getTripId();
     const filteredData = filterData(
       data,
       'name',
@@ -69,14 +66,13 @@ export async function addLocationToTrip(data) {
     );
     return JSON.parse(JSON.stringify(modTrip));
   } catch (err) {
-    console.error(err);
+    console.error('Actions error', err.message);
     throw new Error(`Couldn't create new location. ${err.message}`);
   }
 }
 
-export async function deleteLocationFromTrip(name) {
+export async function deleteLocationFromTrip(tripId, name) {
   try {
-    const tripId = await getTripId();
     const location = await Location.findOne({ trip: tripId, name });
     const imageUrls = location.images;
     // remove Location from the Trip
@@ -95,10 +91,8 @@ export async function deleteLocationFromTrip(name) {
   }
 }
 
-export async function deleteTrip() {
+export async function deleteTrip(tripId) {
   try {
-    const tripId = await getTripId();
-    // console.log('API delete', tripId);
     const trip = await Trip.findById(tripId);
     const locationsArray = trip.locations;
     const locationsToDelete = locationsArray.reduce(
@@ -211,12 +205,9 @@ export async function navigate(url = '/') {
   redirect(url);
 }
 
-async function getTripId() {
+// todo - make CheckTripId
+async function checkTripOrigin(tripId) {
   try {
-    const headersList = headers();
-    // read the custom x-url header to get tripId
-    const header_url = headersList.get('x-url') || '';
-    const tripId = header_url.split('/').at(-1);
     // check if trip is created by logged in user
     await connectToDatabase();
     const trip = await Trip.findById(tripId);

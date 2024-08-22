@@ -2,11 +2,6 @@ import { NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req) {
-  // if (req.nextUrl.pathname.includes('/trips')) {
-  // Store current request url in a custom header, which can be read later
-  const requestHeaders = new Headers(req.headers);
-  requestHeaders.set('x-url', req.url);
-  // }
   if (req.nextUrl.pathname.includes('/account')) {
     // Get the token from the request
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
@@ -17,21 +12,10 @@ export async function middleware(req) {
       return NextResponse.redirect(url);
     }
     // If the token exists, proceed with the request
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    });
-  } else
-    return NextResponse.next({
-      // Apply new request headers
-      request: {
-        headers: requestHeaders,
-      },
-    });
+    return NextResponse.next();
+  } else return NextResponse.next();
 }
-
 // paths in which the middleware applies
-// export const config = {
-//   matcher: ['/account'],
-// };
+export const config = {
+  matcher: ['/account'],
+};

@@ -48,7 +48,7 @@ export default function Page({ params }) {
       const res = await fetch(`/api/friends`);
       const data = await res.json();
       userId.current = data.data.userId;
-      travelers.current = [...data.data.friends, data.data.user];
+      travelers.current = [...data.data.user.friends, data.data.user];
       // setSelectedTravelers([data.data.user]);
       document.querySelector('.mainTitle').innerHTML = 'Edit Trip';
     }
@@ -87,8 +87,8 @@ export default function Page({ params }) {
         duration,
         coverImage,
       };
-      // console.log('new info', completeData);
-      await editTrip(completeData);
+      console.log('new info', trip._id, completeData);
+      await editTrip(trip._id, completeData);
       clearQueryData();
       toast.success('🏞️ Trip info is edited!');
       // clear form

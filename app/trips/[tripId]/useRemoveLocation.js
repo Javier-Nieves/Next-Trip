@@ -2,13 +2,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { deleteLocationFromTrip } from '@/app/_lib/actions';
 import { useEdgeStore } from '@/app/_lib/edgestore';
+import { usePathname } from 'next/navigation';
 
 export function useRemoveLocation() {
   const queryClient = useQueryClient();
   const { edgestore } = useEdgeStore();
+  const tripId = usePathname().split('/').at(-1);
 
   const { mutate: removeLocation, isLoading: isEditing } = useMutation({
-    mutationFn: (name) => deleteLocationFromTrip(name),
+    mutationFn: (name) => deleteLocationFromTrip(tripId, name),
     onSuccess: async (urlsToDelete) => {
       // delete all images from edgeStore
       try {

@@ -35,6 +35,24 @@ export default function Page({ params }) {
   const mapContainer = useRef(null);
   const tripMap = useRef(null);
 
+  const createLocationsLayer = useCallback(
+    function createLocationsLayer() {
+      // updating layer's source if new feature is added
+      if (tripMap.current?.getSource('locations')) {
+        tripMap.current.getSource('locations').setData({
+          type: 'FeatureCollection',
+          features: features.current,
+        });
+      }
+      if (typeof tripMap.current === 'object' && isEditingSession)
+        handleLocationLayer();
+      tripMap.current?.on('load', () => {
+        handleLocationLayer();
+      });
+    },
+    [isEditingSession],
+  );
+
   //! 1) get trip info & display map
   const { trip, isLoading } = useTrip(params.tripId);
   const result = useMap(mapContainer.current, trip);
@@ -155,7 +173,7 @@ export default function Page({ params }) {
       drawRoute(routeData);
     }
     plotPath();
-  }, [isHike, trip]);
+  }, [isHike, trip, tripMap.current]);
 
   function fillGeoArrays(locations, bounds) {
     if (!locations?.length) return;
@@ -180,24 +198,6 @@ export default function Page({ params }) {
     waypoints.current = newWaypoints;
     features.current = newFeatures;
   }
-  const createLocationsLayer = useCallback(
-    function createLocationsLayer() {
-      // updating layer's source if new feature is added
-      if (tripMap.current?.getSource('locations')) {
-        tripMap.current.getSource('locations').setData({
-          type: 'FeatureCollection',
-          features: features.current,
-        });
-      }
-      if (typeof tripMap.current === 'object' && isEditingSession)
-        handleLocationLayer();
-      tripMap.current?.on('load', () => {
-        handleLocationLayer();
-      });
-    },
-    [isEditingSession],
-  );
-
   function handleLocationLayer() {
     // console.log('\x1b[36m%s\x1b[0m', 'map', tripMap.current);
     // creating source for the Locations layer

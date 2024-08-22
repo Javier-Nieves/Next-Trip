@@ -7,32 +7,32 @@ import User from '../models/userModel';
 import Location from '../models/locationModel';
 
 export async function getPublicTrips() {
-  try {
-    // get session and connect to the DB
-    const [session] = await Promise.all([auth(), connectToDatabase()]);
-    const user = await User.findById(session?.user.id);
+  // try {
+  // get session and connect to the DB
+  const [session] = await Promise.all([auth(), connectToDatabase()]);
+  const user = await User.findById(session?.user.id);
 
-    // if user is authenticated - show all public trips and private trips of user's friends
-    let trips = [];
-    if (!user)
-      trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
-    else {
-      trips = await Trip.find({
-        $or: [
-          { private: false },
-          { createdBy: { $in: user.friends } },
-          { createdBy: session.user.id },
-        ],
-      }).sort({ createdAt: -1 });
-    }
-
-    return trips;
-  } catch (err) {
-    console.error(err.message);
-    throw new Error(
-      `Something went wrong. Could not get trips. ${err.message}`,
-    );
+  // if user is authenticated - show all public trips and private trips of user's friends
+  let trips = [];
+  if (!user)
+    trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
+  else {
+    trips = await Trip.find({
+      $or: [
+        { private: false },
+        { createdBy: { $in: user.friends } },
+        { createdBy: session.user.id },
+      ],
+    }).sort({ createdAt: -1 });
   }
+
+  return trips;
+  // } catch (err) {
+  //   console.error(err.message);
+  //   throw new Error(
+  //     `Something went wrong. Could not get trips. ${err.message}`,
+  //   );
+  // }
 }
 
 export async function getUserTrips(userId, showPrivateTrips = false) {
@@ -96,10 +96,6 @@ export async function getFriendsInfo() {
       .populate('friends')
       .populate('friendRequests')
       .exec();
-    // const friends = user.friends;
-    // const friendRequests = user.friendRequests;
-    // console.log('friends', friends);
-    // console.log('friendReqs', friendRequests);
     return { user, userId: session.user.id };
   } catch (err) {
     console.error(err.message);

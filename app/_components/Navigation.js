@@ -9,7 +9,6 @@ import {
 import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
 import ExpandableMenu from './ExpandableMenu';
-import {} from 'react-icons/fa';
 
 export default async function Navigation() {
   const session = await auth();
