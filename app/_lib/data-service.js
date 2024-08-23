@@ -7,7 +7,6 @@ import User from '../models/userModel';
 import Location from '../models/locationModel';
 
 export async function getPublicTrips() {
-  // try {
   // get session and connect to the DB
   const [session] = await Promise.all([auth(), connectToDatabase()]);
   const user = await User.findById(session?.user.id);
@@ -27,12 +26,6 @@ export async function getPublicTrips() {
   }
 
   return trips;
-  // } catch (err) {
-  //   console.error(err.message);
-  //   throw new Error(
-  //     `Something went wrong. Could not get trips. ${err.message}`,
-  //   );
-  // }
 }
 
 export async function getUserTrips(userId, showPrivateTrips = false) {
@@ -53,7 +46,6 @@ export async function getUserTrips(userId, showPrivateTrips = false) {
       }).sort({
         createdAt: 1,
       });
-    // console.log('trips', trips);
     return trips;
   } catch (err) {
     console.error(err.message);
