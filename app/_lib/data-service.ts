@@ -5,28 +5,62 @@ import { auth } from './auth';
 import Trip from '../models/tripModel';
 import User from '../models/userModel';
 import Location from '../models/locationModel';
+import { TripDocument, UserDocument, Session } from '@/app/_lib/types';
 
-export async function getPublicTrips() {
+export async function getPublicTrips(): Promise<TripDocument[]> {
   // get session and connect to the DB
-  const [session] = await Promise.all([auth(), connectToDatabase()]);
-  const user = await User.findById(session?.user.id);
+  await connectToDatabase();
+  const session: Session = await auth();
+
+  console.log('\x1b[36m%s\x1b[0m', 'session', session);
+
+  // Define user and trips
+  let user: UserDocument | null = null;
+  let trips: TripDocument[] = [];
+
+  if (session?.user.id) {
+    user = await User.findById(session.user.id);
+  }
 
   // if user is authenticated - show all public trips and private trips of user's friends
-  let trips = [];
-  if (!user)
-    trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
-  else {
+  if (!user) {
+    trips = await Trip.find({ private: false }).sort({ createdAt: -1 }).exec();
+  } else {
     trips = await Trip.find({
       $or: [
         { private: false },
         { createdBy: { $in: user.friends } },
         { createdBy: session.user.id },
       ],
-    }).sort({ createdAt: -1 });
+    })
+      .sort({ createdAt: -1 })
+      .exec();
   }
 
   return trips;
 }
+
+// export async function getPublicTrips() {
+//   // get session and connect to the DB
+//   const [session] = await Promise.all([auth(), connectToDatabase()]);
+//   const user = await User.findById(session?.user.id);
+//   console.log('\x1b[36m%s\x1b[0m', 'session', session);
+//   // if user is authenticated - show all public trips and private trips of user's friends
+//   let trips = [];
+//   if (!user)
+//     trips = await Trip.find({ private: false }).sort({ createdAt: -1 });
+//   else {
+//     trips = await Trip.find({
+//       $or: [
+//         { private: false },
+//         { createdBy: { $in: user.friends } },
+//         { createdBy: session.user.id },
+//       ],
+//     }).sort({ createdAt: -1 });
+//   }
+
+//   return trips;
+// }
 
 export async function getUserTrips(userId, showPrivateTrips = false) {
   try {

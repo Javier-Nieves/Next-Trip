@@ -4,7 +4,6 @@ import { getPublicTrips } from './_lib/data-service';
 export default async function Page() {
   // index page renders all public trips when user isn't logged in
   const trips = await getPublicTrips();
-  // console.log('\x1b[36m%s\x1b[0m', 'Am I server?', trips.length);
 
   return (
     <div className="flex flex-col items-center">
