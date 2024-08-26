@@ -3,12 +3,29 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { getTripInfo, getUserInfo } from '../_lib/data-service';
 import PhotoLink from './PhotoLink';
+import {
+  UserInfo,
+  TripInfo,
+  BasicUserInfo,
+  TripDocument,
+} from '@/app/_lib/types';
 
-async function TripCard({ trip, cardNumber }) {
-  const { isFriend, isMe } = await getUserInfo(trip.createdBy);
-  const { travelersArray } = await getTripInfo(trip._id);
+interface TripCardProps {
+  trip: TripDocument;
+  cardNumber: number;
+}
 
-  const isBigCard = cardNumber < 3;
+// prettier-ignore
+async function TripCard({ trip, cardNumber }: TripCardProps): Promise<JSX.Element> {
+  let isFriend: boolean;
+  let isMe: boolean;
+  let travelersArray: BasicUserInfo[] = [];
+  const userInfo: UserInfo | void = await getUserInfo(trip.createdBy);
+  const tripInfo: TripInfo | void = await getTripInfo(trip._id);
+  if (userInfo) ({ isFriend, isMe } = userInfo);
+  if (tripInfo) travelersArray = tripInfo.travelersArray;
+
+  const isBigCard: boolean = cardNumber < 3;
 
   const formattedDate = trip.date ? format(trip.date, 'dd MMMM yyyy') : '';
 
@@ -32,7 +49,7 @@ async function TripCard({ trip, cardNumber }) {
               : 'Friend'}
         </div>
       )}
-      <Link href={`/trips/${trip.id}`}>
+      <Link href={`/trips/${trip._id}`}>
         <div className="relative h-1/2 md:h-2/3">
           <Image
             src={trip.coverImage}
@@ -46,16 +63,9 @@ async function TripCard({ trip, cardNumber }) {
         </div>
       </Link>
 
-      <PhotoLink
-        type="card"
-        travelersArray={travelersArray}
-        big={isBigCard}
-        position={
-          'absolute -translate-x-1/2 -translate-y-1/2 top-1/2 md:top-2/3 left-1/2'
-        }
-      />
+      <PhotoLink type="card" travelersArray={travelersArray} big={isBigCard} />
 
-      <Link href={`/trips/${trip.id}`}>
+      <Link href={`/trips/${trip._id}`}>
         <div className="flex flex-col justify-center p-4 text-center h-1/3">
           <h2
             className={`${isBigCard ? 'text-2xl' : 'text-xl'} font-semibold mt-7`}

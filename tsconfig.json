@@ -28,7 +28,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
-    "app/_components/TripCard.js"
+    "app/_components/TripCard.tsx"
   ],
   "exclude": ["node_modules"]
 }

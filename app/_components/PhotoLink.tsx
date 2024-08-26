@@ -1,8 +1,19 @@
 import Link from 'next/link';
-import travelerImage from '../../public/user.png';
-import Spinner from './Spinner';
 
-function PhotoLink({ travelersArray, type, big }) {
+import {
+  UserInfo,
+  TripInfo,
+  BasicUserInfo,
+  TripDocument,
+} from '@/app/_lib/types';
+
+interface PhotoLinkProps {
+  travelersArray: BasicUserInfo[];
+  type: string;
+  big: boolean;
+}
+
+function PhotoLink({ travelersArray, type, big }: PhotoLinkProps): JSX.Element {
   // type can be 'inTrip' - on trip page, 'desc' - in trip description, 'card' - on the tripCard
 
   // display photo of the trip's creator of up to 3 photos of trip's travelers
@@ -20,7 +31,7 @@ function PhotoLink({ travelersArray, type, big }) {
           >
             <Link href={`/collections/${traveler.id}`}>
               <img
-                src={traveler.photo || travelerImage}
+                src={traveler.photo || '/user.png'}
                 alt="Traveler"
                 className="object-cover w-full h-full"
               />

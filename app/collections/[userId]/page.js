@@ -19,7 +19,7 @@ export default async function Page({ params }) {
   trustedIds.push(params.userId);
 
   const trips = await getUserTrips(params.userId, trustedIds.includes(myId));
-  const columns = trips.length > 3 ? 4 : trips.length;
+  const columns = trips.length > 2 ? 3 : trips.length;
 
   return (
     <div className="flex flex-col items-center justify-center pb-8">

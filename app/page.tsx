@@ -1,9 +1,10 @@
 import TripCard from './_components/TripCard';
 import { getPublicTrips } from './_lib/data-service';
+import { TripDocument } from '@/app/_lib/types';
 
-export default async function Page() {
+export default async function Page(): Promise<JSX.Element> {
   // index page renders all public trips when user isn't logged in
-  const trips = await getPublicTrips();
+  const trips: TripDocument[] = await getPublicTrips();
 
   return (
     <div className="flex flex-col items-center">

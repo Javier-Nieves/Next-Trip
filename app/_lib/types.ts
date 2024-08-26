@@ -21,6 +21,7 @@ export interface UserDocument {
 
 export interface TripDocument {
   _id: string;
+  name: string;
   travelers: string[];
   locations: string[];
   description: string;
@@ -31,4 +32,26 @@ export interface TripDocument {
   createdBy: string;
   duration: number;
   coverImage: string;
+}
+
+export interface UserInfo {
+  user: UserDocument | null;
+  name?: string;
+  photo?: string;
+  isMe: boolean;
+  myId?: string;
+  isFriend: boolean;
+  friends: string[];
+}
+
+export interface BasicUserInfo {
+  id: string;
+  name: string;
+  photo?: string;
+}
+
+export interface TripInfo {
+  trip: TripDocument | null;
+  travelersArray: { name: string; photo?: string; id: string }[];
+  isMyTrip: boolean;
 }
