@@ -1,6 +1,6 @@
 import { signInAction } from '@/app/_lib/actions';
 
-function SignInButton() {
+function SignInButton(): JSX.Element {
   return (
     <form action={signInAction}>
       <button className="flex items-center gap-6 px-10 py-4 text-lg font-medium border rounded-lg border-primary-300 hover:bg-slate-300">

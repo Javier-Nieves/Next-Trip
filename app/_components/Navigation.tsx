@@ -10,7 +10,7 @@ import { auth } from '../_lib/auth';
 import SignOutButton from './SignOutButton';
 import ExpandableMenu from './ExpandableMenu';
 
-export default async function Navigation() {
+export default async function Navigation(): Promise<JSX.Element> {
   const session = await auth();
   const user = session?.user;
 

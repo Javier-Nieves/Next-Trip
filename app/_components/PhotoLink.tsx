@@ -1,11 +1,6 @@
 import Link from 'next/link';
 
-import {
-  UserInfo,
-  TripInfo,
-  BasicUserInfo,
-  TripDocument,
-} from '@/app/_lib/types';
+import { BasicUserInfo } from '@/app/_lib/types';
 
 interface PhotoLinkProps {
   travelersArray: BasicUserInfo[];

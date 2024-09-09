@@ -1,7 +1,7 @@
 import { ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
 import { signOutAction } from '../_lib/actions';
 
-function SignOutButton() {
+function SignOutButton(): JSX.Element {
   return (
     <form action={signOutAction} className="flex items-center">
       <button className="w-full gap-4">

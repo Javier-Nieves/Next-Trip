@@ -4,7 +4,7 @@ export const metadata = {
   title: 'Login',
 };
 
-export default function Page() {
+export default function Page(): JSX.Element {
   return (
     <div className="flex flex-col items-center gap-10 mt-20">
       <h2 className="text-3xl font-semibold">Sign in to access your account</h2>

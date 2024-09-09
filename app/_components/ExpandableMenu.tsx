@@ -2,7 +2,14 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-function ExpandableMenu({ children, icon, type }) {
+interface ExpandableMenuProps {
+  children: React.ReactNode;
+  icon: React.ReactNode;
+  type: string;
+}
+
+// prettier-ignore
+function ExpandableMenu({ children, icon, type }: ExpandableMenuProps): JSX.Element {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
   function toggleMenu() {

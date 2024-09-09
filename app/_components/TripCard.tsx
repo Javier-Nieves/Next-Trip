@@ -12,11 +12,11 @@ import {
 
 interface TripCardProps {
   trip: TripDocument;
-  cardNumber: number;
+  cardNumber?: number;
 }
 
 // prettier-ignore
-async function TripCard({ trip, cardNumber }: TripCardProps): Promise<JSX.Element> {
+async function TripCard({ trip, cardNumber=1 }: TripCardProps): Promise<JSX.Element> {
   let isFriend: boolean;
   let isMe: boolean;
   let travelersArray: BasicUserInfo[] = [];

@@ -1,4 +1,13 @@
-function Button({ children, className, disabled, type, onClick }) {
+interface ButtonProps {
+  children: React.ReactNode;
+  className?: string;
+  disabled?: boolean;
+  type?: 'button' | 'delete' | 'bright' | 'menu' | 'small' | 'smallDelete';
+  onClick?: () => void;
+}
+
+// prettier-ignore
+function Button({ children, className, disabled, type, onClick }: ButtonProps): JSX.Element {
   let additionalClass =
     'bg-black hover:bg-[var(--color-grey-tr-7)] text-[var(--color-yellow)] rounded-full shadow-lg';
   if (type === 'delete')

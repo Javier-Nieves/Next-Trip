@@ -7,7 +7,7 @@ import logo from '../../public/backpack.png';
 
 const playFont = Dancing_Script({ subsets: ['latin'] });
 
-function Logo() {
+function Logo(): JSX.Element {
   return (
     <Link href="/" className="z-10 flex items-center gap-2">
       <Image

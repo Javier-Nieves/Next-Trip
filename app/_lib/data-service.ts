@@ -45,11 +45,14 @@ export async function getPublicTrips(): Promise<TripDocument[]> {
   return trips;
 }
 
-export async function getUserTrips(userId, showPrivateTrips = false) {
+export async function getUserTrips(
+  userId: string,
+  showPrivateTrips: boolean = false,
+): Promise<TripDocument[] | void> {
   try {
     await connectToDatabase();
     // find all trip where User was a traveler or creator
-    let trips;
+    let trips: TripDocument[] = [];
     if (showPrivateTrips)
       trips = await Trip.find({
         $or: [{ travelers: userId }, { createdBy: userId }],
