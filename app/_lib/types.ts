@@ -13,8 +13,8 @@ export interface UserDocument {
   name: string;
   email: string;
   photo: string;
-  friends: string[];
-  friendRequests: string[];
+  friends: string[] | UserDocument[];
+  friendRequests: string[] | UserDocument[];
   role: string;
   active: string;
 }

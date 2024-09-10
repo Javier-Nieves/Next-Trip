@@ -11,13 +11,13 @@ import { FaArrowLeft, FaSave } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { editTrip } from '@/app/_lib/actions';
+import { useTrip } from '@/app/trips/[tripId]/useTrip';
 import { MultiImageDropzoneUsage } from '@/app/_components/MultiImageDropzoneUsage';
 import SmallToggle from '@/app/_components/SmallToggle';
 import Button from '@/app/_components/Button';
 import TravelersList from '@/app/_components/TravelersList';
 
 import 'react-day-picker/dist/style.css';
-import { useTrip } from '@/app/trips/[tripId]/useTrip';
 
 export default function Page({ params }) {
   // todo - only creator can access this page

@@ -3,8 +3,9 @@
 import { useFriends } from './useFriends';
 import Spinner from '@/app/_components/Spinner';
 import FriendCard from '@/app/_components/FriendCard';
+import { UserDocument } from '@/app/_lib/types';
 
-export default function Page() {
+export default function Page(): JSX.Element {
   const { user, isLoading } = useFriends();
 
   const friendColumns = user?.friends.length > 8 ? 2 : 1;

@@ -95,8 +95,18 @@ export async function getUserInfo(id: string): Promise<UserInfo | void> {
       name: user.name,
       photo: user.photo,
       isMe: user._id.toString() === session.user.id,
-      isFriend: user.friends.includes(session.user.id),
-      friends: user.friends,
+      isFriend: user.friends.some(
+        (friend: string | UserDocument) =>
+          typeof friend === 'string'
+            ? friend === session.user.id // unpopulated case (friend is a string ID)
+            : friend._id.toString() === session.user.id, // populated case (friend is a UserDocument)
+      ),
+      friends: user.friends.map(
+        (friend: string | UserDocument) =>
+          typeof friend === 'string'
+            ? friend // unpopulated
+            : friend._id.toString(), // populated
+      ),
       myId: session.user.id,
     };
   } catch (err) {
@@ -104,11 +114,15 @@ export async function getUserInfo(id: string): Promise<UserInfo | void> {
   }
 }
 
-export async function getFriendsInfo() {
+export async function getFriendsInfo(): Promise<{
+  user: UserDocument | null;
+  userId: string;
+}> {
   try {
     await connectToDatabase();
-    const session = await auth();
-    const user = await User.findById(session.user.id)
+    const session: Session | null = await auth();
+    if (!session) return;
+    const user: UserDocument | null = await User.findById(session.user.id)
       .populate('friends')
       .populate('friendRequests')
       .exec();
