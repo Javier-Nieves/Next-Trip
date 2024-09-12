@@ -11,20 +11,22 @@ import { useDeclineRequest } from '@/app/friends/useDeclineRequest';
 
 function FriendCard({ friend, type }) {
   // type can be 'friend' or 'request'
-  const { addFriend, isLoading: isAdding } = useAddFriend();
-  const { deleteFriend, isLoading: isDeleting } = useDeleteFriend();
-  const { declineRequest, isLoading: isDeclining } = useDeclineRequest();
+  const { addFriend, isAdding } = useAddFriend();
+  const { deleteFriend, isDeleting } = useDeleteFriend();
+  const { declineRequest, isDeclining } = useDeclineRequest();
   const isWorking = isAdding || isDeclining || isDeleting;
-
-  async function handleAddFriend(e) {
+  // prettier-ignore
+  async function handleAddFriend(e: React.MouseEvent<HTMLElement>): Promise<void> {
     e.preventDefault();
     addFriend(friend._id);
   }
-  async function handleDecline(e) {
+  // prettier-ignore
+  async function handleDecline(e: React.MouseEvent<HTMLElement>): Promise<void> {
     e.preventDefault();
     declineRequest(friend._id);
   }
-  async function handleDeleteFriend(e) {
+  // prettier-ignore
+  async function handleDeleteFriend(e: React.MouseEvent<HTMLElement>): Promise<void> {
     e.preventDefault();
     deleteFriend(friend._id);
   }

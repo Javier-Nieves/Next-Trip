@@ -1,21 +1,17 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { FaTram } from 'react-icons/fa';
 import { MultiImageDropzoneUsage } from './MultiImageDropzoneUsage';
 import { useAddLocation } from '@/app/trips/[tripId]/useAddLocation';
-import { FaTram } from 'react-icons/fa';
+import { NewLocationData } from '@/app/_lib/types';
 
-function NewLocationForm({
-  isHike,
-  setNewLocationCoordinates,
-  coordinates,
-  setTripToShow,
-}) {
+function NewLocationForm({ isHike, setNewLocationCoordinates, coordinates }) {
   const { register, handleSubmit } = useForm();
   const [uploadedImages, setUploadedImages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const { isEditing, addLocation } = useAddLocation();
+  const { addLocation } = useAddLocation();
 
-  async function onSubmit(data) {
+  async function onSubmit(data: NewLocationData): Promise<void> {
     try {
       // adding controlled field 'images' into the form data
       // setValue('images', uploadedImages);
@@ -28,7 +24,7 @@ function NewLocationForm({
         images: uploadedImages,
         isHike,
       };
-      addLocation(fullData);
+      addLocation(JSON.stringify(fullData));
       setNewLocationCoordinates([]);
     } catch (err) {
       console.error(err);
@@ -82,7 +78,6 @@ function NewLocationForm({
         <div className="grid grid-cols-[110px,1fr] w-full text-lg">
           <span className="my-auto">Description: </span>
           <textarea
-            type="text"
             className="h-24 p-2 rounded-md text-md"
             {...register('description')}
           />

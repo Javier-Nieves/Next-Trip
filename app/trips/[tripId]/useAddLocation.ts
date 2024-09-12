@@ -7,8 +7,9 @@ export function useAddLocation() {
   const queryClient = useQueryClient();
   const tripId = usePathname().split('/').at(-1);
 
-  const { mutate: addLocation, isLoading: isEditing } = useMutation({
-    mutationFn: (data) => addLocationToTrip(tripId, data),
+  // prettier-ignore
+  const { mutate: addLocation, isPending:isEditing } = useMutation<void, Error, string>({
+    mutationFn: (data) => addLocationToTrip(JSON.parse(data), tripId),
     onSuccess: () => {
       // Invalidate all queries with 'trip' in the query key
       queryClient.invalidateQueries({
@@ -25,5 +26,5 @@ export function useAddLocation() {
     },
   });
 
-  return { isEditing, addLocation };
+  return { addLocation, isEditing };
 }

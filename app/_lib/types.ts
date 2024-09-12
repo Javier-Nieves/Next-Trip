@@ -55,3 +55,18 @@ export interface TripInfo {
   travelersArray: { name: string; photo?: string; id: string }[];
   isMyTrip: boolean;
 }
+
+export interface NewLocationData {
+  name: string;
+  address: string;
+  description: string;
+}
+
+export interface FullLocationData {
+  name: string;
+  address: string;
+  description: string;
+  coordinates: string[];
+  isHike: boolean;
+  images: File[];
+}

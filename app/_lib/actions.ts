@@ -2,13 +2,12 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-
 import Trip from '../models/tripModel';
 import Location from '../models/locationModel';
 import User from '../models/userModel';
-
 import connectToDatabase from './mongoose';
-import { handlers, auth, signIn, signOut } from './auth';
+import { auth, signIn, signOut } from './auth';
+import { FullLocationData } from '@/app/_lib/types';
 
 export async function signInAction() {
   await signIn('google', { redirectTo: '/' });
@@ -43,24 +42,18 @@ export async function editTrip(tripId, data) {
   redirect(`/trips/${modifiedTrip._id}`);
 }
 
-export async function addLocationToTrip(tripId, data) {
+export async function addLocationToTrip(
+  data: FullLocationData,
+  tripId: string,
+) {
   try {
-    const filteredData = filterData(
-      data,
-      'name',
-      'address',
-      'description',
-      'coordinates',
-      'isHike',
-      'images',
-    );
     const newLocation = await Location.create({
-      ...filteredData,
+      ...data,
       trip: tripId,
     });
     const modTrip = await Trip.findByIdAndUpdate(
       tripId,
-      { $push: { locations: newLocation.id }, isHike: filteredData.isHike },
+      { $push: { locations: newLocation.id }, isHike: data.isHike },
       { new: true },
     );
     return JSON.parse(JSON.stringify(modTrip));
@@ -122,7 +115,7 @@ export async function deleteTrip(tripId) {
   }
 }
 
-export async function addFriend(id) {
+export async function addFriend(id: string): Promise<void> {
   // console.log('\x1b[36m%s\x1b[0m', 'adding friend', id);
   try {
     await connectToDatabase();
@@ -151,7 +144,7 @@ export async function addFriend(id) {
   }
 }
 
-export async function deleteFriend(id) {
+export async function deleteFriend(id: string): Promise<void> {
   try {
     await connectToDatabase();
     const session = await auth();
@@ -221,6 +214,7 @@ async function checkTripOrigin(tripId) {
   }
 }
 
+// todo - DELETE:
 function filterData(obj, ...allowedFields) {
   // console.log('filtering', obj);
   // clear all unwanted fields from an object. For security

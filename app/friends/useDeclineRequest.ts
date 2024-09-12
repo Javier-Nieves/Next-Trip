@@ -4,18 +4,21 @@ import toast from 'react-hot-toast';
 
 export function useDeclineRequest() {
   const queryClient = useQueryClient();
-  const { mutate: declineRequest, isLoading } = useMutation({
+  // prettier-ignore
+  const { mutate: declineRequest, isPending } = useMutation<void, Error, string>({
     mutationFn: declineRequestApi,
     onSuccess: () => {
       toast('Friend request denied', {
         icon: '🔥',
       });
       queryClient.invalidateQueries({
-        active: true,
+        predicate: (query) =>
+          query.state.fetchStatus === 'fetching' ||
+          query.state.fetchStatus === 'paused',
       });
     },
     onError: () => toast.error("Couldn't process action"),
   });
 
-  return { declineRequest, isLoading };
+  return { declineRequest, isDeclining: isPending };
 }

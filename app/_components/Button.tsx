@@ -3,7 +3,7 @@ interface ButtonProps {
   className?: string;
   disabled?: boolean;
   type?: 'button' | 'delete' | 'bright' | 'menu' | 'small' | 'smallDelete';
-  onClick?: () => void;
+  onClick?(e: any): void;
 }
 
 // prettier-ignore

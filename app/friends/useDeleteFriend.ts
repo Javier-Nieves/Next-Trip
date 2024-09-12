@@ -4,18 +4,20 @@ import { deleteFriend as deleteFriendApi } from '@/app/_lib/actions';
 
 export function useDeleteFriend() {
   const queryClient = useQueryClient();
-  const { mutate: deleteFriend, isLoading } = useMutation({
+  const { mutate: deleteFriend, isPending } = useMutation<void, Error, string>({
     mutationFn: deleteFriendApi,
     onSuccess: () => {
       toast('Friend is deleted!', {
         icon: '😵‍💫',
       });
       queryClient.invalidateQueries({
-        active: true,
+        predicate: (query) =>
+          query.state.fetchStatus === 'fetching' ||
+          query.state.fetchStatus === 'paused',
       });
     },
     onError: () => toast.error("Couldn't delete friend"),
   });
 
-  return { deleteFriend, isLoading };
+  return { deleteFriend, isDeleting: isPending };
 }
