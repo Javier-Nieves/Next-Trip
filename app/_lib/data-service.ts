@@ -101,6 +101,12 @@ export async function getUserInfo(id: string): Promise<UserInfo | void> {
             ? friend === session.user.id // unpopulated case (friend is a string ID)
             : friend._id.toString() === session.user.id, // populated case (friend is a UserDocument)
       ),
+      isFriendRequest: user.friendRequests.some(
+        (friendReq: string | UserDocument) =>
+          typeof friendReq === 'string'
+            ? friendReq === session.user.id // unpopulated case (friendReq is a string ID)
+            : friendReq._id.toString() === session.user.id, // populated case (friendReq is a UserDocument)
+      ),
       friends: user.friends.map(
         (friend: string | UserDocument) =>
           typeof friend === 'string'

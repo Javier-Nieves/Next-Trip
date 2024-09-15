@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Button from './Button';
 import {
   FaRegTimesCircle,
   FaRegCheckCircle,
@@ -8,8 +7,15 @@ import {
 import { useAddFriend } from '@/app/friends/useAddFriend';
 import { useDeleteFriend } from '@/app/friends/useDeleteFriend';
 import { useDeclineRequest } from '@/app/friends/useDeclineRequest';
+import Button from './Button';
+import { UserDocument } from '../_lib/types';
 
-function FriendCard({ friend, type }) {
+interface FriendCardProps {
+  friend: UserDocument;
+  type: 'friend' | 'request';
+}
+
+function FriendCard({ friend, type }: FriendCardProps): JSX.Element {
   // type can be 'friend' or 'request'
   const { addFriend, isAdding } = useAddFriend();
   const { deleteFriend, isDeleting } = useDeleteFriend();
@@ -57,7 +63,7 @@ function FriendCard({ friend, type }) {
             type="smallDelete"
             className="absolute bottom-0 right-0 m-1 rounded-md"
             disabled={isWorking}
-            onClick={handleDeleteFriend}
+            handleClick={handleDeleteFriend}
           >
             <FaRegTrashAlt />
           </Button>

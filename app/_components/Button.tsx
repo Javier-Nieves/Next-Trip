@@ -3,11 +3,11 @@ interface ButtonProps {
   className?: string;
   disabled?: boolean;
   type?: 'button' | 'delete' | 'bright' | 'menu' | 'small' | 'smallDelete';
-  onClick?(e: any): void;
+  handleClick?(e: React.MouseEvent<HTMLButtonElement>): void;
 }
 
 // prettier-ignore
-function Button({ children, className, disabled, type, onClick }: ButtonProps): JSX.Element {
+function Button({ children, className, disabled, type, handleClick }: ButtonProps): JSX.Element {
   let additionalClass =
     'bg-black hover:bg-[var(--color-grey-tr-7)] text-[var(--color-yellow)] rounded-full shadow-lg';
   if (type === 'delete')
@@ -29,7 +29,7 @@ function Button({ children, className, disabled, type, onClick }: ButtonProps): 
   return (
     <button
       disabled={disabled}
-      onClick={onClick}
+      onClick={handleClick}
       className={`flex text-lg items-center gap-1 px-4 py-3 font-semibold transition-all disabled:cursor-not-allowed disabled:bg-gray-500 disabled:text-gray-300 ${additionalClass} ${className || ''}`}
     >
       {!disabled ? children : 'Loading...'}

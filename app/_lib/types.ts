@@ -41,6 +41,7 @@ export interface UserInfo {
   isMe: boolean;
   myId?: string;
   isFriend: boolean;
+  isFriendRequest: boolean;
   friends: string[];
 }
 

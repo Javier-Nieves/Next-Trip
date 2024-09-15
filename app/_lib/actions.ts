@@ -2,12 +2,12 @@
 
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
+import { auth, signIn, signOut } from './auth';
+import { FullLocationData } from '@/app/_lib/types';
+import connectToDatabase from './mongoose';
 import Trip from '../models/tripModel';
 import Location from '../models/locationModel';
 import User from '../models/userModel';
-import connectToDatabase from './mongoose';
-import { auth, signIn, signOut } from './auth';
-import { FullLocationData } from '@/app/_lib/types';
 
 export async function signInAction() {
   await signIn('google', { redirectTo: '/' });
@@ -169,6 +169,49 @@ export async function deleteFriend(id: string): Promise<void> {
     await Promise.all([userPromise, friendPromise]);
     revalidatePath(`/`);
   } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
+export async function sendRequest(id: string): Promise<void> {
+  // console.log('\x1b[36m%s\x1b[0m', 'sending request to ', id);
+  try {
+    await connectToDatabase();
+    const session = await auth();
+    const user = await User.findById(id);
+
+    if (user.friendRequests.includes(session.user.id)) return;
+    await User.findByIdAndUpdate(
+      id,
+      {
+        $addToSet: { friendRequests: session.user.id },
+      },
+      { new: true },
+    );
+    revalidatePath(`/collections/${id}`);
+  } catch (err) {
+    // console.log('\x1b[36m%s\x1b[0m', 'error', err.message);
+    throw new Error(err.message);
+  }
+}
+export async function cancelRequest(id: string): Promise<void> {
+  // console.log('\x1b[36m%s\x1b[0m', 'sending request to ', id);
+  try {
+    await connectToDatabase();
+    const session = await auth();
+    const user = await User.findById(id);
+
+    if (!user.friendRequests.includes(session.user.id)) return;
+    await User.findByIdAndUpdate(
+      id,
+      {
+        $pull: { friendRequests: session.user.id },
+      },
+      { new: true },
+    );
+    revalidatePath(`/collections/${id}`);
+  } catch (err) {
+    // console.log('\x1b[36m%s\x1b[0m', 'error', err.message);
     throw new Error(err.message);
   }
 }
